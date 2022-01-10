@@ -24,10 +24,11 @@
   let dropTarget;
   let droppedFile;
   let fileUrl;
+  let file;
 
   onMount(() => {
     dropTarget.addEventListener('filedrop', (fileDropEvent) => {
-      let file = fileDropEvent.files[0];
+      file = fileDropEvent.files[0];
       if (fileUrl != undefined) {
         URL.revokeObjectURL(fileUrl);
       }
