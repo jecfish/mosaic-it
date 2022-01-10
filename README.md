@@ -1,3 +1,8 @@
+![Vercel](https://therealsujitk-vercel-badge.vercel.app/?app=mosaic-it)
+
+# Where?
+The app will be auto deploy to https://mosaic-it.vercel.app when you push changes to main.
+
 # create-svelte
 
 Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte);
