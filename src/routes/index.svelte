@@ -6,7 +6,6 @@
 	let file;
 
 	function handleFileDrop(fileDropEvent) {
-		console.log(fileDropEvent);
 		file = fileDropEvent.files[0];
 		if (fileUrl != undefined) {
 			URL.revokeObjectURL(fileUrl);
