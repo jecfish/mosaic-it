@@ -31,6 +31,7 @@
   },
   "type": "module",
   "dependencies": {
-    "pinch-zoom-element": "^1.1.1"
+    "pinch-zoom-element": "^1.1.1",
+    "tesseract.js": "^2.1.5"
   }
 }
