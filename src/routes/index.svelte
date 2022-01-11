@@ -1,26 +1,52 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { createWorker, Page } from 'tesseract.js';
 
 	let canvas;
 	let droppedFile: HTMLImageElement;
 	let fileUrl;
 	let file;
 	let isFileDropMode = true;
+	let ctx;
+	const worker = createWorker();
 
-	function handleFileDrop(fileDropEvent) {
+	async function handleFileDrop(fileDropEvent) {
 		file = fileDropEvent.files[0];
 		if (fileUrl != undefined) {
 			URL.revokeObjectURL(fileUrl);
 		}
 		fileUrl = URL.createObjectURL(file);
 		isFileDropMode = false;
+
+		await worker.load();
+		await worker.loadLanguage('eng');
+		await worker.initialize('eng');
+		const { data } = await worker.recognize(file);
+
+		textDetected(data);
 	}
 
 	function drawImage() {
-		const ctx = canvas.getContext('2d');
+		ctx = canvas.getContext('2d');
 		canvas.width = droppedFile.width;
         canvas.height = droppedFile.height;
         ctx.drawImage(droppedFile, 0, 0, canvas.width, canvas.height);
+	}
+
+	function textDetected(data: Tesseract.Page) {
+		ctx = canvas.getContext('2d');
+console.log('Detected texts:', data.words);
+		data.words.forEach(word => {
+			if (word.confidence < 70.0) return;
+			const { x0, y0, x1, y1 } = word.bbox;
+			const width = x1 - x0;
+			const height = y1 - y0;
+			ctx.strokeStyle = 'red';
+			ctx.lineWidth = 2;
+			ctx.strokeRect(x0, y0, width, height);
+			ctx.font = '16px serif';
+			ctx.fillText(word.text, x0, y0);
+		});
 	}
 
 	onMount(async () => {
