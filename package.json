@@ -29,5 +29,8 @@
     "tslib": "^2.3.1",
     "typescript": "^4.4.3"
   },
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "pinch-zoom-element": "^1.1.1"
+  }
 }
