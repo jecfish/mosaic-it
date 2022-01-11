@@ -13,11 +13,11 @@
 		// https://kit.svelte.dev/faq#:~:text=How%20do%20I%20use%20a%20client%2Dside%20only%20library%20that%20depends%20on%20document%20or%20window%3F
 		await import('file-drop-element');
 		// await import('pinch-zoom-element');
-    
-    const onmessage = (event: MessageEvent) => {
-			console.log(event)
+
+		const onmessage = (event: MessageEvent) => {
+			console.log(event);
 			if (event.data.action !== 'load-image') return;
-			handleFileDrop({files: [event.data.file]});
+			handleFileDrop({ files: [event.data.file] });
 			navigator.serviceWorker.removeEventListener('message', onmessage);
 		};
 
@@ -35,7 +35,7 @@
 	}
 
 	function drawImage() {
-		canvasCmp.draw(droppedFile);
+		canvasCmp.init(droppedFile);
 	}
 </script>
 
@@ -90,6 +90,7 @@
 	.canvas-container {
 		width: 100%;
 		height: 100%;
+		display: flex;
 	}
 
 	file-drop {

@@ -1,108 +1,163 @@
 <script lang="ts">
-import { onMount } from 'svelte';
+	import { onMount } from 'svelte';
 
-/* Canvas */
-let imgFile;
-let canvas;
-let ctx;
-let flag = false;
-let prevRect = undefined;
+	/* Canvas */
+	let imgFile: HTMLImageElement;
+	let refresh = false;
+	let canvas;
+	let ctx;
+	const storedRects = [];
 
-let startX = 0;
-let startY = 0;
-let endX = 0;
-let endY = 0;
+	export function init(img) {
+		imgFile = img;
+		refresh = true;
+		draw();
+		mouse.start(canvas);
+	}
 
-let color = 'black';
-let thickness = 15;
+	onMount(() => {
+		ctx = canvas.getContext('2d');
+		requestAnimationFrame(mainLoop);
+	})
 
-export function draw(droppedFile) {
-    ctx = canvas.getContext('2d');
-    canvas.width = droppedFile.width;
-    canvas.height = droppedFile.height;
-    ctx.drawImage(droppedFile, 0, 0, canvas.width, canvas.height);
-}
+	function draw() {
+		canvas.width = imgFile.width;
+		canvas.height = imgFile.height;
+		ctx.drawImage(imgFile, 0, 0, canvas.width, canvas.height);
+		console.log(storedRects);
+		let lineDash = [20, 5];
+		storedRects.forEach(rect => rect.draw(ctx, { lineDash }));
+		// ctx.strokeStyle = 'red';
+		lineDash = [];
+		rect.draw(ctx, { lineDash });
+	}
 
-function drawRect(e) {
-    const offsetX = getOffset(canvas).left;
-    const offsetY = getOffset(canvas).top;
+	function mainLoop() {
+		if (refresh || mouse.down || mouse.up || mouse.button) {
+			refresh = false;
+			if (mouse.down) {
+				mouse.down = false;
+				rect.restart(mouse);
+			} else if (mouse.button) {
+				rect.update(mouse);
+			} else if (mouse.up) {
+				mouse.up = false;
+				rect.update(mouse);
+				storedRects.push(rect.toRect());
+			}
+			draw();
+		}
+		requestAnimationFrame(mainLoop);
+	}
 
-    if (e.type == 'mousedown') {
-        // set a flag indicating the drag has begun
-        startX = e.clientX - offsetX;
-        startY = e.clientY - offsetY;
-        flag = true;
-    }
-    if (e.type == 'mouseup' || e.type == 'mouseout') {
-        // the drag is over, clear the dragging flag
-        flag = false;
-    }
-    if (e.type == 'mousemove') {
-        if (!flag) return;
-        
-        // Draw free form
-        // ctx.beginPath();
-        // ctx.moveTo(startX, startY);
-        // ctx.lineTo(endX, endY);
-        // ctx.strokeStyle = color;
-        // ctx.lineWidth = thickness;
-        // ctx.stroke();
-        // ctx.closePath();
-        // ctx.strokeStyle = 'green';
-        // ctx.globalAlpha = 0.1;
-        // ctx.strokeRect(prevRect.startX,prevRect.startY,prevRect.width,prevRect.height);
+	function mosaicIt() {
+		storedRects.forEach(rect => rect.fill = true);
+		
+	}
 
-        // Draw rectangle
-        const mouseX = e.clientX - offsetX;
-        const mouseY = e.clientY - offsetY;
-        const width = mouseX - startX;
-        const height = mouseY - startY;
-        if (prevRect) {
-            ctx.clearRect(prevRect.startX,prevRect.startY,prevRect.width,prevRect.height);
-        }
-        prevRect = {startX,startY,width,height}
-        ctx.beginPath();
-        ctx.rect(prevRect.startX,prevRect.startY,prevRect.width,prevRect.height);
-        ctx.globalAlpha = 0.5;
-        ctx.fillStyle = 'yellow';
-        ctx.fill();
-        ctx.lineWidth = 7;
-        ctx.strokeStyle = 'black';
-        ctx.stroke();
-        
-    }
-}
+	const rect = (() => {
+		let x1, y1, x2, y2;
+		let show = false;
+		function fix() {
+			rect.x = Math.min(x1, x2);
+			rect.y = Math.min(y1, y2);
+			rect.w = Math.max(x1, x2) - Math.min(x1, x2);
+			rect.h = Math.max(y1, y2) - Math.min(y1, y2);
+		}
+		function draw(ctx, { lineDash }) {
+			ctx.setLineDash(lineDash);
 
-function getOffset(element) {
-    if (!element.getClientRects().length) {
-        return { top: 0, left: 0 };
-    }
+			// mosaic it
+			if (this.fill) {
+				ctx.fillStyle = 'white';
+				// ctx.globalAlpha = .2;
+				// ctx.filter = 'blur(10px)';
+				ctx.fillRect(this.x, this.y, this.w, this.h);
+			} else {
+				ctx.strokeRect(this.x, this.y, this.w, this.h);
+			}
+		}
+		const rect = { x: 0, y: 0, w: 0, h: 0, draw };
+		const API = {
+			restart(point) {
+				x2 = x1 = point.x;
+				y2 = y1 = point.y;
+				fix();
+				show = true;
+			},
+			update(point) {
+				x2 = point.x;
+				y2 = point.y;
+				fix();
+				show = true;
+			},
+			toRect() {
+				show = false;
+				return Object.assign({}, rect);
+			},
+			draw(ctx, options) {
+				if (show) {
+					rect.draw(ctx, options);
+				}
+			},
+			show: false
+		};
+		return API;
+	})();
 
-    let rect = element.getBoundingClientRect();
-    let win = element.ownerDocument.defaultView;
-    return {
-        top: rect.top + win.pageYOffset,
-        left: rect.left + win.pageXOffset
-    };
-}
+	const mouse = {
+		button: false,
+		x: 0,
+		y: 0,
+		down: false,
+		up: false,
+		element: null,
+		event(e) {
+			const m = mouse;
+			m.bounds = m.element.getBoundingClientRect();
+			m.x = e.pageX - m.bounds.left - scrollX;
+			m.y = e.pageY - m.bounds.top - scrollY;
+			const prevButton = m.button;
+			m.button = e.type === 'mousedown' ? true : e.type === 'mouseup' ? false : mouse.button;
+			if (!prevButton && m.button) {
+				m.down = true;
+			}
+			if (prevButton && !m.button) {
+				m.up = true;
+			}
+		},
+		start(element) {
+			mouse.element = element;
+			['down','up','move'].forEach((name) => document.addEventListener(`mouse${name}`, mouse.event));
+		}
+	};
 </script>
-
-<canvas
-    bind:this={canvas}
-    width={0}
-    height={0}
-    on:mouseup={drawRect}
-    on:mouseout={drawRect}
-    on:mousemove={drawRect}
-    on:mousedown={drawRect}
-    on:blur={drawRect}
-/>
+<div class="container">
+	<div class="controls">
+		<button on:click={mosaicIt}>Apply</button>
+	</div>
+	<canvas bind:this={canvas} width={0} height={0} />
+</div>
 
 <style>
-canvas {
-    margin: auto;
-    padding: 0;
-    position: relative;
-    display: block;
-}
+	.container {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		align-content: center;
+		justify-content: center;
+		width: 100%;
+	}
+
+	.controls {
+		margin: 20px;
+	}
+
+	canvas {
+		/* margin: auto; */
+		padding: 0;
+		position: relative;
+		display: block;
+		cursor: crosshair;
+	}
 </style>
