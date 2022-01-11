@@ -28,6 +28,16 @@
 		await import('file-drop-element');
 		await import('pinch-zoom-element');
 
+		const onmessage = (event: MessageEvent) => {
+			console.log(event)
+			if (event.data.action !== 'load-image') return;
+			handleFileDrop({files: [event.data.file]});
+			navigator.serviceWorker.removeEventListener('message', onmessage);
+		};
+
+		navigator.serviceWorker.addEventListener('message', onmessage);
+		navigator.serviceWorker.controller!.postMessage('share-ready');
+
 	});
 </script>
 
