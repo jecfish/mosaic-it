@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import Canvas from '../components/Canvas.svelte';
+	import Controls from '../components/Controls.svelte';
 
 	let droppedFile: HTMLImageElement;
 	let fileUrl;
@@ -22,7 +23,7 @@
 		};
 
 		navigator.serviceWorker.addEventListener('message', onmessage);
-		navigator.serviceWorker.controller!.postMessage('share-ready');
+		navigator.serviceWorker.controller?.postMessage('share-ready');
 	});
 
 	function handleFileDrop(fileDropEvent) {
@@ -86,7 +87,19 @@
 	{/if}
 </file-drop>
 
+<div id="control-container"><Controls file={file} fileUrl={fileUrl}/></div>
+
 <style>
+	#control-container {
+		position:absolute;
+		bottom: 0;
+		right: 0;
+		margin: 2em;
+		padding: 1em;
+		border-radius: 2em;
+		background-color: hotpink;
+	}
+
 	.canvas-container {
 		width: 100%;
 		height: 100%;
