@@ -51,7 +51,7 @@
 	</style>
 </svelte:head>
 <div class="canvas-container" class:hide={isFileDropMode}>
-	<Canvas bind:this={child} />
+	<Canvas bind:this={canvasCmp} />
 </div>
 
 <file-drop on:filedrop={handleFileDrop} accept="image/*" class:hide={!isFileDropMode}>
@@ -77,14 +77,6 @@
 </file-drop>
 
 <style>
-	canvas {
-		margin: auto;
-		padding: 0;
-		position: relative;
-		display: block;
-	}
-
-	pinch-zoom,
 	.canvas-container {
 		width: 100%;
 		height: 100%;
