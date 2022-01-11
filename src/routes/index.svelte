@@ -1,32 +1,23 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 
-	let dropTarget;
-	let dropTarget2;
 	let droppedFile;
 	let fileUrl;
 	let file;
+
+	function handleFileDrop(fileDropEvent) {
+		console.log(fileDropEvent);
+		file = fileDropEvent.files[0];
+		if (fileUrl != undefined) {
+			URL.revokeObjectURL(fileUrl);
+		}
+		fileUrl = URL.createObjectURL(file);
+	}
 
 	onMount(async () => {
 		// https://kit.svelte.dev/faq#:~:text=How%20do%20I%20use%20a%20client%2Dside%20only%20library%20that%20depends%20on%20document%20or%20window%3F
 		await import('file-drop-element');
 		await import('pinch-zoom-element');
-
-		function handleFileDrop(fileDropEvent) {
-			file = fileDropEvent.files[0];
-			if (fileUrl != undefined) {
-				URL.revokeObjectURL(fileUrl);
-			}
-			fileUrl = URL.createObjectURL(file);
-		}
-
-		dropTarget.addEventListener('filedrop', async (fileDropEvent) => {
-			handleFileDrop(fileDropEvent);
-		});
-
-		dropTarget2.addEventListener('change', async ({ target }) => {
-			handleFileDrop(target);
-		});
 	});
 </script>
 
@@ -49,10 +40,10 @@
 		}
 	</style>
 </svelte:head>
-
-<file-drop bind:this={dropTarget} accept="image/*">
+<!-- <canvas style="margin:auto;padding:0;position:relative;display:block;" id="imgCanvas" width="0" height="0" onclick="draw(event)"></canvas> -->
+<file-drop on:filedrop={handleFileDrop} accept="image/*">
 	{#if fileUrl == undefined}
-		<input id="file-picker" class="file-picker__input" type="file" accept="image/*" bind:this={dropTarget2}>
+		<input id="file-picker" class="file-picker__input" type="file" accept="image/*" on:change={e => handleFileDrop(e.target)}>
 		<label for="file-picker" class="file-picker__label">
 			<h1>Drop or select an image to start auto mosaic.</h1>
 			<svg viewBox="0 0 24 24" class="file-picker__icon">
