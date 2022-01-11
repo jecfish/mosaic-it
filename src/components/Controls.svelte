@@ -1,6 +1,5 @@
 <script>
 	import { onMount } from 'svelte';
-import { toggle_class } from 'svelte/internal';
 
 	export let file;
 	export let fileUrl;
@@ -42,9 +41,12 @@ a[enabled=true] {
 }
 
 </style>
-<a id="refresh" on:click={reload}><img src="images/refresh_black_24dp.svg" /></a>
-<a id="download" download enabled={hasFile} href={fileUrl} bind:this={downloadElement}
-	><img src="images/download_black_24dp.svg" /></a
->
-<a id="share" enabled={hasFile} bind:this={shareElement} on:click={share}><img src="images/share_black_24dp.svg" /></a
->
+<a id="refresh" on:click={reload}>
+    <img src="images/refresh_black_24dp.svg" alt="Refresh" />
+</a>
+<a id="download" download enabled={hasFile} href={fileUrl} bind:this={downloadElement}>
+    <img src="images/download_black_24dp.svg" alt="Download" />
+    </a>
+<a id="share" enabled={hasFile} bind:this={shareElement} on:click={share}>
+    <img src="images/share_black_24dp.svg" alt="Share" />
+</a>
