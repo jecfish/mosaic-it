@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import Canvas from '../components/Canvas.svelte';
+	import Controls from '../components/Controls.svelte';
 
 	let droppedFile: HTMLImageElement;
 	let fileUrl;
@@ -86,7 +87,15 @@
 	{/if}
 </file-drop>
 
+<div id="control-container"><Controls /></div>
+
 <style>
+	#control-container {
+		position:absolute;
+		bottom: 0;
+		right: 0;
+	}
+
 	.canvas-container {
 		width: 100%;
 		height: 100%;
