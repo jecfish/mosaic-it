@@ -1,6 +1,6 @@
 {
-    "short_name": "Mosasic-er",
-    "name": "Quick Mosasic",
+    "short_name": "Mosaic It",
+    "name": "Mosaic It",
     "start_url": "/",
     "icons": [
       {
@@ -38,5 +38,5 @@
     "display": "standalone",
     "scope": "/",
     "theme_color": "#4CAF50",
-    "description": "Quickly blur out sensetive information in an image"
+    "description": "Quickly blur out sensitive information in an image"
 }
