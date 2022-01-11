@@ -1,11 +1,19 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import Canvas from '../components/Canvas.svelte';
 
-	let canvas;
 	let droppedFile: HTMLImageElement;
 	let fileUrl;
 	let file;
 	let isFileDropMode = true;
+
+	let canvasCmp;
+
+	onMount(async () => {
+		// https://kit.svelte.dev/faq#:~:text=How%20do%20I%20use%20a%20client%2Dside%20only%20library%20that%20depends%20on%20document%20or%20window%3F
+		await import('file-drop-element');
+		// await import('pinch-zoom-element');
+	});
 
 	function handleFileDrop(fileDropEvent) {
 		file = fileDropEvent.files[0];
@@ -17,18 +25,8 @@
 	}
 
 	function drawImage() {
-		const ctx = canvas.getContext('2d');
-		canvas.width = droppedFile.width;
-        canvas.height = droppedFile.height;
-        ctx.drawImage(droppedFile, 0, 0, canvas.width, canvas.height);
+		canvasCmp.draw(droppedFile);
 	}
-
-	onMount(async () => {
-		// https://kit.svelte.dev/faq#:~:text=How%20do%20I%20use%20a%20client%2Dside%20only%20library%20that%20depends%20on%20document%20or%20window%3F
-		await import('file-drop-element');
-		await import('pinch-zoom-element');
-
-	});
 </script>
 
 <svelte:head>
@@ -40,9 +38,8 @@
 			position: relative;
 			width: 100%;
 			height: 100%;
-			font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
-				Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
-				sans-serif;
+			font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell,
+				Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 		}
 
 		div#svelte {
@@ -53,17 +50,25 @@
 		}
 	</style>
 </svelte:head>
-<pinch-zoom class:hide={isFileDropMode}>
-	<canvas bind:this={canvas} width={0} height={0}></canvas>
-</pinch-zoom>
+<div class="canvas-container" class:hide={isFileDropMode}>
+	<Canvas bind:this={child} />
+</div>
 
 <file-drop on:filedrop={handleFileDrop} accept="image/*" class:hide={!isFileDropMode}>
 	{#if fileUrl == undefined}
-		<input id="file-picker" class="file-picker__input" type="file" accept="image/*" on:change={e => handleFileDrop(e.target)}>
+		<input
+			id="file-picker"
+			class="file-picker__input"
+			type="file"
+			accept="image/*"
+			on:change={(e) => handleFileDrop(e.target)}
+		/>
 		<label for="file-picker" class="file-picker__label">
 			<h1>Drop or select an image to start auto mosaic.</h1>
 			<svg viewBox="0 0 24 24" class="file-picker__icon">
-				<path d="M19 7v3h-2V7h-3V5h3V2h2v3h3v2h-3zm-3 4V8h-3V5H5a2 2 0 00-2 2v12c0 1.1.9 2 2 2h12a2 2 0 002-2v-8h-3zM5 19l3-4 2 3 3-4 4 5H5z" />
+				<path
+					d="M19 7v3h-2V7h-3V5h3V2h2v3h3v2h-3zm-3 4V8h-3V5H5a2 2 0 00-2 2v12c0 1.1.9 2 2 2h12a2 2 0 002-2v-8h-3zM5 19l3-4 2 3 3-4 4 5H5z"
+				/>
 			</svg>
 		</label>
 	{:else}
@@ -73,13 +78,14 @@
 
 <style>
 	canvas {
-		margin:auto;
-		padding:0;
-		position:relative;
-		display:block;
+		margin: auto;
+		padding: 0;
+		position: relative;
+		display: block;
 	}
 
-	pinch-zoom {
+	pinch-zoom,
+	.canvas-container {
 		width: 100%;
 		height: 100%;
 	}
@@ -117,7 +123,7 @@
 	.file-picker__icon {
 		fill: #0a7df8;
 		width: 10rem;
-    	height: 10rem;
+		height: 10rem;
 	}
 
 	:global(file-drop.drop-valid) {
