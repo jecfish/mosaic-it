@@ -4,12 +4,13 @@ import { build, files, timestamp } from '$service-worker';
 const cacheName = `Mosasic${timestamp}`;
 
 self.addEventListener("install", (installEvent) => {
-  self.skipWaiting();
 
   installEvent.waitUntil(
     caches.open(cacheName)
       .then(cache => cache.addAll([...build, ...files, "/"]))
   );
+
+  self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
