@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 
 	let dropTarget;
+	let dropTarget2;
 	let droppedFile;
 	let fileUrl;
 	let file;
@@ -9,12 +10,22 @@
 	onMount(async () => {
 		// https://kit.svelte.dev/faq#:~:text=How%20do%20I%20use%20a%20client%2Dside%20only%20library%20that%20depends%20on%20document%20or%20window%3F
 		await import('file-drop-element');
-		dropTarget.addEventListener('filedrop', (fileDropEvent) => {
+		await import('pinch-zoom-element');
+
+		function handleFileDrop(fileDropEvent) {
 			file = fileDropEvent.files[0];
 			if (fileUrl != undefined) {
 				URL.revokeObjectURL(fileUrl);
 			}
 			fileUrl = URL.createObjectURL(file);
+		}
+
+		dropTarget.addEventListener('filedrop', async (fileDropEvent) => {
+			handleFileDrop(fileDropEvent);
+		});
+
+		dropTarget2.addEventListener('change', async ({ target }) => {
+			handleFileDrop(target);
 		});
 	});
 </script>
@@ -39,12 +50,19 @@
 	</style>
 </svelte:head>
 
-<h1>Welcome to Auto Mosaic.</h1>
 <file-drop bind:this={dropTarget} accept="image/*">
 	{#if fileUrl == undefined}
-		<p>Drop an image file here to auto-mosasic.</p>
+		<input id="file-picker" class="file-picker__input" type="file" accept="image/*" bind:this={dropTarget2}>
+		<label for="file-picker" class="file-picker__label">
+			<h1>Drop or select an image to start auto mosaic.</h1>
+			<svg viewBox="0 0 24 24" class="file-picker__icon">
+				<path d="M19 7v3h-2V7h-3V5h3V2h2v3h3v2h-3zm-3 4V8h-3V5H5a2 2 0 00-2 2v12c0 1.1.9 2 2 2h12a2 2 0 002-2v-8h-3zM5 19l3-4 2 3 3-4 4 5H5z" />
+			</svg>
+		</label>
 	{:else}
-		<img bind:this={droppedFile} alt="" src={fileUrl} />
+		<pinch-zoom>
+			<img bind:this={droppedFile} alt="" src={fileUrl} />
+		</pinch-zoom>
 	{/if}
 </file-drop>
 
@@ -57,13 +75,42 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+		border: 10px dashed #b8daff;
+		background: #f4f8ff;
+	}
+
+	.file-picker__input {
+		display: none;
+	}
+
+	.file-picker__label {
+		padding: 40px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+		color: #0a7df8;
+	}
+
+	.file-picker__icon {
+		fill: #0a7df8;
+		width: 10rem;
+    	height: 10rem;
 	}
 
 	:global(file-drop.drop-valid) {
-		background-color: green;
+		background-color: #d4edda;
+		border-color: #c3e6cb;
 	}
 
 	:global(file-drop.drop-invalid) {
-		background-color: red;
+		background-color: #f8d7da;
+		border-color: #f5c6cb;
+	}
+
+	:global(html, body) {
+		font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
+            Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
+            sans-serif;
 	}
 </style>
