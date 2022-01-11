@@ -1,9 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 
-	let droppedFile;
+	let canvas;
+	let droppedFile: HTMLImageElement;
 	let fileUrl;
 	let file;
+	let isFileDropMode = true;
 
 	function handleFileDrop(fileDropEvent) {
 		file = fileDropEvent.files[0];
@@ -11,12 +13,21 @@
 			URL.revokeObjectURL(fileUrl);
 		}
 		fileUrl = URL.createObjectURL(file);
+		isFileDropMode = false;
+	}
+
+	function drawImage() {
+		const ctx = canvas.getContext('2d');
+		canvas.width = droppedFile.width;
+        canvas.height = droppedFile.height;
+        ctx.drawImage(droppedFile, 0, 0, canvas.width, canvas.height);
 	}
 
 	onMount(async () => {
 		// https://kit.svelte.dev/faq#:~:text=How%20do%20I%20use%20a%20client%2Dside%20only%20library%20that%20depends%20on%20document%20or%20window%3F
 		await import('file-drop-element');
 		await import('pinch-zoom-element');
+
 	});
 </script>
 
@@ -29,6 +40,9 @@
 			position: relative;
 			width: 100%;
 			height: 100%;
+			font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
+				Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
+				sans-serif;
 		}
 
 		div#svelte {
@@ -39,8 +53,11 @@
 		}
 	</style>
 </svelte:head>
-<!-- <canvas style="margin:auto;padding:0;position:relative;display:block;" id="imgCanvas" width="0" height="0" onclick="draw(event)"></canvas> -->
-<file-drop on:filedrop={handleFileDrop} accept="image/*">
+<pinch-zoom class:hide={isFileDropMode}>
+	<canvas bind:this={canvas} width={0} height={0}></canvas>
+</pinch-zoom>
+
+<file-drop on:filedrop={handleFileDrop} accept="image/*" class:hide={!isFileDropMode}>
 	{#if fileUrl == undefined}
 		<input id="file-picker" class="file-picker__input" type="file" accept="image/*" on:change={e => handleFileDrop(e.target)}>
 		<label for="file-picker" class="file-picker__label">
@@ -50,13 +67,23 @@
 			</svg>
 		</label>
 	{:else}
-		<pinch-zoom>
-			<img bind:this={droppedFile} alt="" src={fileUrl} />
-		</pinch-zoom>
+		<img bind:this={droppedFile} alt="" src={fileUrl} on:load={drawImage} />
 	{/if}
 </file-drop>
 
 <style>
+	canvas {
+		margin:auto;
+		padding:0;
+		position:relative;
+		display:block;
+	}
+
+	pinch-zoom {
+		width: 100%;
+		height: 100%;
+	}
+
 	file-drop {
 		margin-top: 9vh;
 		height: 80vh;
@@ -68,6 +95,10 @@
 		align-items: center;
 		border: 10px dashed #b8daff;
 		background: #f4f8ff;
+	}
+
+	.hide {
+		display: none;
 	}
 
 	.file-picker__input {
@@ -97,11 +128,5 @@
 	:global(file-drop.drop-invalid) {
 		background-color: #f8d7da;
 		border-color: #f5c6cb;
-	}
-
-	:global(html, body) {
-		font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
-            Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
-            sans-serif;
 	}
 </style>
