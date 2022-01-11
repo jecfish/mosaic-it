@@ -68,6 +68,7 @@
 
 <style>
 	file-drop {
+		margin-top: 9vh;
 		height: 80vh;
 		width: 80vw;
 		border-radius: 10px;
