@@ -12,7 +12,7 @@
   let ctx;
   let offscreen: HTMLCanvasElement;
   let offscreenContext: CanvasRenderingContext2D;
-  const storedRects = [];
+  let storedRects = [];
 
   let imgResizeObserver;
   const temptRect = new Rect();
