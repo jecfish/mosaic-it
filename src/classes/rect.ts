@@ -43,7 +43,7 @@ export class Rect {
 
     // mosaic it
     if (this.fill) {
-      ctx.fillStyle = 'white';
+      ctx.fillStyle = '#202124';
       // ctx.globalAlpha = .2;
       // ctx.filter = 'blur(10px)';
       ctx.fillRect(this.x, this.y, this.w, this.h);
