@@ -1,5 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+import type { element } from 'svelte/internal';
+import type { element } from 'svelte/internal';
+import type { element } from 'svelte/internal';
 
 	/* Canvas */
 	let imgFile: HTMLImageElement;
@@ -7,24 +10,32 @@
 	let canvas;
 	let ctx;
 	const storedRects = [];
+	let imgResizeObserver;
 
 	export function init(img) {
 		imgFile = img;
+		// imgResizeObserver.observe(imgFile);
 		refresh = true;
 		draw();
 		mouse.start(canvas);
+		touch.start(canvas);
 	}
 
 	onMount(() => {
 		ctx = canvas.getContext('2d');
 		requestAnimationFrame(mainLoop);
+
+		// TODO: Support resize and redraw
+		imgResizeObserver = new ResizeObserver(entries => {
+			console.log('image resize:', entries);
+		});
 	})
 
 	function draw() {
 		canvas.width = imgFile.width;
 		canvas.height = imgFile.height;
+
 		ctx.drawImage(imgFile, 0, 0, canvas.width, canvas.height);
-		console.log(storedRects);
 		let lineDash = [20, 5];
 		storedRects.forEach(rect => rect.draw(ctx, { lineDash }));
 		// ctx.strokeStyle = 'red';
@@ -131,6 +142,34 @@
 			['down','up','move'].forEach((name) => document.addEventListener(`mouse${name}`, mouse.event));
 		}
 	};
+
+	const touch = {
+		element: null,
+		event(e) {
+			e.preventDefault();
+
+			const t = e.touches.length? e.touches[0] : e.changedTouches[0];
+
+			if (e.type === 'touchstart') {
+				const mouseEvent = new MouseEvent("mousedown", t);
+				document.dispatchEvent(mouseEvent);
+			}
+
+			if (e.type === 'touchend') {
+				const mouseEvent = new MouseEvent("mouseup", t);
+				document.dispatchEvent(mouseEvent);
+			}
+
+			if (e.type === 'touchmove') {
+				const mouseEvent = new MouseEvent("mousemove", t);
+				document.dispatchEvent(mouseEvent);
+			}
+		},
+		start(element) {
+			touch.element = element;
+			['start', 'end', 'move'].forEach((name) => document.addEventListener(`touch${name}`, touch.event, { passive: false }))
+		}
+	}
 </script>
 <div class="container">
 	<div class="controls">
@@ -159,5 +198,6 @@
 		position: relative;
 		display: block;
 		cursor: crosshair;
+		/* max-width: 100%; */
 	}
 </style>
