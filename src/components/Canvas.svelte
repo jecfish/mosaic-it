@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-import { xlink_attr } from 'svelte/internal';
+  import { xlink_attr } from 'svelte/internal';
   import { Rect } from '../classes/rect';
 
   /* Canvas */
@@ -101,9 +101,9 @@ import { xlink_attr } from 'svelte/internal';
       } else if (mouse.up) {
         mouse.up = false;
         temptRect.update(mouse);
-        if(temptRect.w && temptRect.h) {
+        if (temptRect.w && temptRect.h) {
           storedRects = [...storedRects, new Rect(temptRect)];
-        } 
+        }
         // console.log(storedRects);
       }
       draw();
@@ -194,8 +194,8 @@ import { xlink_attr } from 'svelte/internal';
   </div>
   <div class="editor">
     <div bind:this={editorPanel} class="editor-panel" class:mask>
-      {#each storedRects as {x, y, w}, i}
-        <button on:click={(e) => deleteRect(i, e)} style="{ `left:${x+w}px;top:${y}px;` }">x</button>
+      {#each storedRects as { x, y, w }, i}
+        <button on:click={(e) => deleteRect(i, e)} style={`left:${x + w}px;top:${y}px;`}>x</button>
       {/each}
     </div>
     <canvas bind:this={canvas} width={0} height={0} class:mask />
