@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-import type { element } from 'svelte/internal';
-import type { element } from 'svelte/internal';
-import type { element } from 'svelte/internal';
+	import type { element } from 'svelte/internal';
+	import type { element } from 'svelte/internal';
+	import type { element } from 'svelte/internal';
 
 	/* Canvas */
 	let imgFile: HTMLImageElement;
@@ -26,10 +26,10 @@ import type { element } from 'svelte/internal';
 		requestAnimationFrame(mainLoop);
 
 		// TODO: Support resize and redraw
-		imgResizeObserver = new ResizeObserver(entries => {
+		imgResizeObserver = new ResizeObserver((entries) => {
 			console.log('image resize:', entries);
 		});
-	})
+	});
 
 	function draw() {
 		canvas.width = imgFile.width;
@@ -37,7 +37,7 @@ import type { element } from 'svelte/internal';
 
 		ctx.drawImage(imgFile, 0, 0, canvas.width, canvas.height);
 		let lineDash = [20, 5];
-		storedRects.forEach(rect => rect.draw(ctx, { lineDash }));
+		storedRects.forEach((rect) => rect.draw(ctx, { lineDash }));
 		// ctx.strokeStyle = 'red';
 		lineDash = [];
 		rect.draw(ctx, { lineDash });
@@ -62,8 +62,7 @@ import type { element } from 'svelte/internal';
 	}
 
 	function mosaicIt() {
-		storedRects.forEach(rect => rect.fill = true);
-		
+		storedRects.forEach((rect) => (rect.fill = true));
 	}
 
 	const rect = (() => {
@@ -139,7 +138,9 @@ import type { element } from 'svelte/internal';
 		},
 		start(element) {
 			mouse.element = element;
-			['down','up','move'].forEach((name) => document.addEventListener(`mouse${name}`, mouse.event));
+			['down', 'up', 'move'].forEach((name) =>
+				document.addEventListener(`mouse${name}`, mouse.event)
+			);
 		}
 	};
 
@@ -148,29 +149,32 @@ import type { element } from 'svelte/internal';
 		event(e) {
 			e.preventDefault();
 
-			const t = e.touches.length? e.touches[0] : e.changedTouches[0];
+			const t = e.touches.length ? e.touches[0] : e.changedTouches[0];
 
 			if (e.type === 'touchstart') {
-				const mouseEvent = new MouseEvent("mousedown", t);
+				const mouseEvent = new MouseEvent('mousedown', t);
 				document.dispatchEvent(mouseEvent);
 			}
 
 			if (e.type === 'touchend') {
-				const mouseEvent = new MouseEvent("mouseup", t);
+				const mouseEvent = new MouseEvent('mouseup', t);
 				document.dispatchEvent(mouseEvent);
 			}
 
 			if (e.type === 'touchmove') {
-				const mouseEvent = new MouseEvent("mousemove", t);
+				const mouseEvent = new MouseEvent('mousemove', t);
 				document.dispatchEvent(mouseEvent);
 			}
 		},
 		start(element) {
 			touch.element = element;
-			['start', 'end', 'move'].forEach((name) => document.addEventListener(`touch${name}`, touch.event, { passive: false }))
+			['start', 'end', 'move'].forEach((name) =>
+				document.addEventListener(`touch${name}`, touch.event, { passive: false })
+			);
 		}
-	}
+	};
 </script>
+
 <div class="container">
 	<div class="controls">
 		<button on:click={mosaicIt}>Apply</button>
