@@ -41,6 +41,11 @@ export class Rect {
     }
   }
 
+  toRect(): unknown {
+    this.show = false;
+    return { ...this.rect };
+  }
+
   restart(point: { x: number; y: number }): void {
     this.x2 = this.x1 = point.x;
     this.y2 = this.y1 = point.y;
