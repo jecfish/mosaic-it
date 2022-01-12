@@ -65,7 +65,7 @@
 	<Canvas bind:this={canvasCmp} />
 </div>
 
-<file-drop on:filedrop={handleFileDrop} accept="image/*" class:hide={!isFileDropMode}>
+<file-drop on:filedrop={handleFileDrop} accept="image/*">
 	{#if fileUrl == undefined}
 		<input
 			id="file-picker"
@@ -83,7 +83,7 @@
 			</svg>
 		</label>
 	{:else}
-		<img bind:this={droppedFile} alt="" src={fileUrl} on:load={drawImage} />
+		<img bind:this={droppedFile} alt="" src={fileUrl} on:load={drawImage} style="width:100vw" />
 	{/if}
 </file-drop>
 
