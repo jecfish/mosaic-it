@@ -2,11 +2,15 @@
   import { onMount } from 'svelte';
   import Canvas from '../components/Canvas.svelte';
   import Controls from '../components/Controls.svelte';
+  import { Rect } from '../classes/rect';
+  import { createWorker } from 'tesseract.js';
 
   let droppedFile: HTMLImageElement;
-  let fileUrl;
-  let file;
-  let isFileDropMode = true;
+  let fileUrl: string;
+  let file: File;
+  let isFileDropMode: boolean = true;
+  let detectedWords: Tesseract.Word[] = [];
+  const worker = createWorker();
 
   let canvasCmp;
 
@@ -26,17 +30,44 @@
     navigator.serviceWorker.controller?.postMessage('share-ready');
   });
 
-  function handleFileDrop(fileDropEvent) {
+  async function detectText(file: File): Promise<Tesseract.Page> {
+    await worker.load();
+    await worker.loadLanguage('eng');
+    await worker.initialize('eng');
+    const { data } = await worker.recognize(file);
+    await worker.terminate();
+    return data;
+  }
+
+  async function handleFileDrop(fileDropEvent): Promise<void> {
     file = fileDropEvent.files[0];
     if (fileUrl != undefined) {
       URL.revokeObjectURL(fileUrl);
     }
+
+    const { words } = await detectText(file);
+    detectedWords = words;
+
     fileUrl = URL.createObjectURL(file);
     isFileDropMode = false;
   }
 
   function drawImage() {
-    canvasCmp.init(droppedFile);
+    const rects: any[] = [];
+    if (detectedWords.length !== 0) {
+      detectedWords.forEach((word) => {
+        console.log(word);
+        const show = word.confidence < 70.0;
+        const fill = false;
+        const { x0: x, y0: y, x1, y1 } = word.bbox;
+        const w = x1 - x;
+        const h = y1 - y;
+        const rect = new Rect({ x, y, w, h, fill }, show);
+        // Why can't I simply add a `Rect` instance???
+        rects.push(rect.toRect());
+      });
+    }
+    canvasCmp.init(droppedFile, rects);
   }
 </script>
 
