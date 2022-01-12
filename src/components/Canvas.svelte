@@ -12,7 +12,7 @@
   let ctx;
   let offscreen: HTMLCanvasElement;
   let offscreenContext: CanvasRenderingContext2D;
-  const storedRects = [];
+  let storedRects = [];
 
   let imgResizeObserver;
   const temptRect = new Rect();
@@ -93,7 +93,7 @@
     storedRects.forEach((rect) => {
       const newRect = new Rect(rect, true);
       // kludge
-      if (rect.y <0) {
+      if (rect.y < 0) {
         return;
       }
       newRect.imageData = offscreenContext.getImageData(rect.x, rect.y, rect.w, rect.h);
