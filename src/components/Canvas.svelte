@@ -16,10 +16,10 @@
 
     canvas.width = imgFile.width;
     canvas.height = imgFile.height;
-    
+
     draw();
     imgFile.style.display = 'none';
-  
+
     mouse.start(canvas);
     touch.start(canvas);
   }
@@ -208,5 +208,4 @@
     /* max-width: 100%;
     max-height: 100%; */
   }
-
 </style>
