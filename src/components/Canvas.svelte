@@ -19,8 +19,7 @@
     canvas.width = imgFile.width;
     canvas.height = imgFile.height;
 
-    storedRects.push(...rects.map((x) => x.toRect()));
-
+    storedRects.push(...rects);
     draw();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -76,8 +75,8 @@
       } else if (mouse.up) {
         mouse.up = false;
         temptRect.update(mouse);
-        storedRects.push(temptRect.toRect());
-        // console.log(storedRects);
+        storedRects.push(new Rect(temptRect));
+        console.log(storedRects);
       }
       draw();
     }
@@ -92,10 +91,10 @@
   function autoDetect() {
     // TODO: Auto detect logic
     // confirm case
-    storedRects.push({ x: 252, y: 83, w: 27, h: 27, fill: true });
+    storedRects.push(new Rect({ x: 252, y: 83, w: 27, h: 27, fill: true }));
 
     // unsure case
-    storedRects.push({ x: 122, y: 56, w: 44, h: 36, fill: false });
+    storedRects.push(new Rect({ x: 122, y: 56, w: 44, h: 36, fill: false }));
   }
 
   const mouse = {

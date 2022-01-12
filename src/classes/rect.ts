@@ -3,8 +3,8 @@ type RectObject = {
   y: number;
   w: number;
   h: number;
-  text: string;
-  fill: boolean;
+  text?: string;
+  fill?: boolean;
 };
 
 export class Rect {
@@ -13,38 +13,49 @@ export class Rect {
   private x2: number;
   private y2: number;
 
-  rect: RectObject;
+  x = 0;
+  y = 0;
+  w = 0;
+  h = 0;
+
+  text = '';
+  fill = false;
+
   show: boolean;
 
   constructor(rect: RectObject = { x: 0, y: 0, w: 0, h: 0, text: '', fill: false }, show = false) {
-    this.rect = rect;
+    for (const [key, value] of Object.entries(rect)) {
+      this[key] = value;
+    }
+
     this.show = show;
   }
 
   private fix(): void {
-    this.rect.x = Math.min(this.x1, this.x2);
-    this.rect.y = Math.min(this.y1, this.y2);
-    this.rect.w = Math.max(this.x1, this.x2) - Math.min(this.x1, this.x2);
-    this.rect.h = Math.max(this.y1, this.y2) - Math.min(this.y1, this.y2);
+    this.x = Math.min(this.x1, this.x2);
+    this.y = Math.min(this.y1, this.y2);
+    this.w = Math.max(this.x1, this.x2) - Math.min(this.x1, this.x2);
+    this.h = Math.max(this.y1, this.y2) - Math.min(this.y1, this.y2);
   }
 
   private _draw(ctx: CanvasRenderingContext2D, { lineDash }): void {
     ctx.setLineDash(lineDash);
 
     // mosaic it
-    if (this.rect.fill) {
+    if (this.fill) {
       ctx.fillStyle = 'white';
       // ctx.globalAlpha = .2;
       // ctx.filter = 'blur(10px)';
-      ctx.fillRect(this.rect.x, this.rect.y, this.rect.w, this.rect.h);
+      ctx.fillRect(this.x, this.y, this.w, this.h);
     } else {
-      ctx.strokeRect(this.rect.x, this.rect.y, this.rect.w, this.rect.h);
+      ctx.strokeRect(this.x, this.y, this.w, this.h);
     }
   }
 
   toRect(): unknown {
     this.show = false;
-    return { ...this.rect };
+    const { x, y, w, h } = this;
+    return { x, y, w, h };
   }
 
   restart(point: { x: number; y: number }): void {
@@ -68,6 +79,6 @@ export class Rect {
   }
 
   isSensitive(flag: boolean): void {
-    this.rect.fill = flag;
+    this.fill = flag;
   }
 }
