@@ -11,13 +11,15 @@
   let imgResizeObserver;
   const temptRect = new Rect();
 
-  export function init(img) {
+  export function init(img, rects: Rect[] = []) {
     imgFile = img;
     // imgResizeObserver.observe(imgFile);
     refresh = true;
 
     canvas.width = imgFile.width;
     canvas.height = imgFile.height;
+
+    storedRects.push(...rects);
 
     draw();
     imgFile.style.display = 'none';
