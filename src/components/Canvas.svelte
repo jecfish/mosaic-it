@@ -86,7 +86,7 @@
   }
 
   function mosaicIt() {
-    storedRects.map((item) =>  item.fill = true);
+    storedRects.map((item) => (item.fill = true));
     draw();
   }
 
