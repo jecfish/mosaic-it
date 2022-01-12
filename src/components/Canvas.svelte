@@ -40,6 +40,25 @@
     touch.start(canvas);
   }
 
+  export function render() {
+    return new Promise((resolve, reject) => {
+      try {
+        const tmpCanvas = document.createElement('canvas');
+        tmpCanvas.width = canvas.width;
+        tmpCanvas.height = canvas.height;
+
+        const tmpCtx = tmpCanvas.getContext('2d');
+        tmpCtx.drawImage(imgFile, 0, 0);
+        tmpCtx.drawImage(canvas, 0, 0);
+
+        tmpCanvas.toBlob(resolve);
+      } catch (err) {
+        console.error(err);
+        reject(err);
+      }
+    });
+  }
+
   onMount(() => {
     ctx = canvas.getContext('2d');
     requestAnimationFrame(mainLoop);

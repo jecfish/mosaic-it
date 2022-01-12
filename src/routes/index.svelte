@@ -85,6 +85,10 @@
     const rects: Rect[] = [];
     canvasCmp.init(droppedFile, detectedWords);
   }
+
+  function download() {
+    return canvasCmp.render().then((blob) => new File([blob], 'final.png', { type: 'image/png' }));
+  }
 </script>
 
 <svelte:head>
@@ -141,7 +145,7 @@
   </file-drop>
 {/if}
 
-<div id="control-container"><Controls {file} {fileUrl} /></div>
+<div id="control-container"><Controls {file} {fileUrl} onDownloadHandler={download} /></div>
 
 <style>
   #control-container {
