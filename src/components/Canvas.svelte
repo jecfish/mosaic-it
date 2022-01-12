@@ -42,9 +42,8 @@
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(imgFile, 0, 0, canvas.width, canvas.height);
     let lineDash = [20, 5];
-    storedRects.forEach((item) => {
-      const r = new Rect(item, true);
-      r.draw(ctx, { lineDash });
+    storedRects.forEach((rect) => {
+      rect.draw(ctx, { lineDash });
     });
     // ctx.strokeStyle = 'red';
     lineDash = [];
@@ -62,7 +61,7 @@
       } else if (mouse.up) {
         mouse.up = false;
         temptRect.update(mouse);
-        storedRects.push(temptRect.toRect());
+        storedRects.push(temptRect);
         // console.log(storedRects);
       }
       draw();
@@ -71,7 +70,7 @@
   }
 
   function mosaicIt() {
-    storedRects.forEach((item) => (item.fill = true));
+    storedRects.map((item) => item.isSensitive(true));
     draw();
   }
 
