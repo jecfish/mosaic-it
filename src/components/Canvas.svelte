@@ -76,10 +76,10 @@
   function autoDetect() {
     // TODO: Auto detect logic
     // confirm case
-    storedRects.push({ x: 252, y: 83, w: 27, h: 27, fill: true});
+    storedRects.push({ x: 252, y: 83, w: 27, h: 27, fill: true });
 
     // unsure case
-    storedRects.push({ x: 122, y: 56, w: 44, h: 36, fill: false});
+    storedRects.push({ x: 122, y: 56, w: 44, h: 36, fill: false });
   }
 
   const mouse = {
