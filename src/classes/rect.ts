@@ -3,6 +3,7 @@ type RectObject = {
   y: number;
   w: number;
   h: number;
+  text: string;
   fill: boolean;
 };
 
@@ -15,7 +16,7 @@ export class Rect {
   rect: RectObject;
   show: boolean;
 
-  constructor(rect: RectObject = { x: 0, y: 0, w: 0, h: 0, fill: false }, show = false) {
+  constructor(rect: RectObject = { x: 0, y: 0, w: 0, h: 0, text: '', fill: false }, show = false) {
     this.rect = rect;
     this.show = show;
   }
