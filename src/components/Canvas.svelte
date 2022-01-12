@@ -178,9 +178,16 @@
     },
     start(element) {
       touch.element = element;
-      ['start', 'end', 'move'].forEach((name) =>
-        document.addEventListener(`touch${name}`, touch.event, { passive: false })
-      );
+      ['start', 'end', 'move'].forEach((name) => {
+        document.body.addEventListener(
+          `touch${name}`,
+          (e) => {
+            if (e.target == canvas) e.preventDefault();
+          },
+          false
+        );
+        canvas.addEventListener(`touch${name}`, touch.event, false);
+      });
     }
   };
 </script>
