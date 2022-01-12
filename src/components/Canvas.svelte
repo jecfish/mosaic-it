@@ -153,7 +153,7 @@
 <div class="container">
   <div class="controls">
     <button on:click={mosaicIt}>Apply mosaic</button>
-    <button on:click={() => mask = !mask}>
+    <button on:click={() => (mask = !mask)}>
       {mask ? 'View masked' : 'View original'}
     </button>
   </div>
