@@ -62,7 +62,7 @@
       detectedWords.forEach((word) => {
         console.log(word);
         // if isSentiveData then fill = true
-        word.confidence >= 70.0
+        // word.confidence < 70.0;
         const fill = false;
         const { x0: x, y0: y, x1, y1 } = word.bbox;
         const text = word.text;
