@@ -84,7 +84,13 @@
     </label>
   </file-drop>
 {:else}
-  <img bind:this={droppedFile} alt="" src={fileUrl} on:load={drawImage} style="max-width:100%;max-height:90vh;" />
+  <img
+    bind:this={droppedFile}
+    alt=""
+    src={fileUrl}
+    on:load={drawImage}
+    style="max-width:100%;max-height:90vh;"
+  />
 {/if}
 
 <div id="control-container"><Controls {file} {fileUrl} /></div>
