@@ -98,8 +98,14 @@
 <div class="spinner" class:hide={!isLoadingMode}>
   <RingLoader size="60" color="#FF3E00" unit="px" duration="1s" />
 </div>
-<div class="canvas-container" class:hide={isFileDropMode}>
-  <Canvas bind:this={canvasCmp} />
+<div class="canvas-container" class:hide={isFileDropMode || isLoadingMode}>
+  <Canvas bind:this={canvasCmp}>
+    {#if fileUrl != undefined}
+      <!-- disable resize -->
+      <!-- style="max-width:100%;max-height:90vh;" -->
+      <img bind:this={droppedFile} alt="" src={fileUrl} on:load={drawImage} />
+    {/if}
+  </Canvas>
 </div>
 
 {#if fileUrl == undefined}
@@ -120,14 +126,6 @@
       </svg>
     </label>
   </file-drop>
-{:else}
-  <img
-    bind:this={droppedFile}
-    alt=""
-    src={fileUrl}
-    on:load={drawImage}
-    style="max-width:100%;max-height:90vh;"
-  />
 {/if}
 
 <div id="control-container"><Controls {file} {fileUrl} /></div>

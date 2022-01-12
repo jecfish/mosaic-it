@@ -19,10 +19,22 @@
     canvas.width = imgFile.width;
     canvas.height = imgFile.height;
 
-    storedRects.push(...rects);
+    storedRects.push(...rects.map((x) => x.toRect()));
 
     draw();
-    imgFile.style.display = 'none';
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // experiment pixelate
+    // console.log(ctx.getImageData( 0, 0, canvas.width, canvas.height).data);
+    // const sample_size = 80;
+
+    // for (let y = 0; y < h; y += sample_size) {
+    //   for (let x = 0; x < w; x += sample_size) {
+    //     let p = (x + (y*w)) * 4;
+    //     ctx.fillStyle = "rgba(" + pixelArr[p] + "," + pixelArr[p + 1] + "," + pixelArr[p + 2] + "," + pixelArr[p + 3] + ")";
+    //     ctx.fillRect(x, y, sample_size, sample_size);
+    //   }
+    // }
 
     mouse.start(canvas);
     touch.start(canvas);
@@ -40,12 +52,16 @@
 
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(imgFile, 0, 0, canvas.width, canvas.height);
-    let lineDash = [20, 5];
-    storedRects.forEach((rect) => {
-      rect.draw(ctx, { lineDash });
+    // ctx.stroke();
+    ctx.rect(0, 0, canvas.width, canvas.height);
+
+    let lineDash = [10, 5];
+    ctx.strokeStyle = 'red';
+
+    storedRects.forEach((item) => {
+      const r = new Rect(item, true);
+      r.draw(ctx, { lineDash });
     });
-    // ctx.strokeStyle = 'red';
     lineDash = [];
     temptRect.draw(ctx, { lineDash });
   }
@@ -61,7 +77,7 @@
       } else if (mouse.up) {
         mouse.up = false;
         temptRect.update(mouse);
-        storedRects.push(temptRect);
+        storedRects.push(temptRect.toRect());
         // console.log(storedRects);
       }
       draw();
@@ -149,7 +165,10 @@
     <button on:click={mosaicIt}>Apply mosaic</button>
     <button on:click={autoDetect}>Auto detect mosaic area</button>
   </div>
-  <canvas bind:this={canvas} width={0} height={0} />
+  <div class="editor">
+    <canvas bind:this={canvas} width={0} height={0} />
+    <slot />
+  </div>
 </div>
 
 <style>
@@ -167,10 +186,8 @@
   }
 
   canvas {
-    /* margin: auto; */
     padding: 0;
-    position: relative;
-    display: block;
+    position: absolute;
     cursor: crosshair;
 
     /* max-width: 100%;
