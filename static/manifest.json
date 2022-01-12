@@ -1,42 +1,42 @@
 {
-    "short_name": "Mosaic It",
-    "name": "Mosaic It",
-    "start_url": "/",
-    "icons": [
-      {
-        "src": "/images/icon-512.png",
-        "type": "image/png",
-        "sizes": "512x512"
-      },
-      {
-        "src": "/images/icon-192.png",
-        "sizes": "192x192",
-        "type": "image/png"
-      },
-      {
-        "src": "/images/icon-192-maskable.png",
-        "sizes": "192x192",
-        "type": "image/png",
-        "purpose": "maskable" 
-      }
-    ],
-    "share_target": {
-        "action": "/?utm_medium=PWA&utm_source=share-target&share-target",
-        "method": "POST",
-        "enctype": "multipart/form-data",
-        "params": {
-            "files": [
-              {
-                "name": "file",
-                "accept": ["image/*"]
-              }
-            ]
-          }
+  "short_name": "Mosaic It",
+  "name": "Mosaic It",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "/images/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
     },
-    "id": "/",
-    "background_color": "#4CAF50",
-    "display": "standalone",
-    "scope": "/",
-    "theme_color": "#4CAF50",
-    "description": "Quickly blur out sensitive information in an image"
+    {
+      "src": "/images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/images/icon-192-maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "share_target": {
+    "action": "/?utm_medium=PWA&utm_source=share-target&share-target",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "files": [
+        {
+          "name": "file",
+          "accept": ["image/*"]
+        }
+      ]
+    }
+  },
+  "id": "/",
+  "background_color": "#4CAF50",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#4CAF50",
+  "description": "Quickly blur out sensitive information in an image"
 }

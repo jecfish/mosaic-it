@@ -3,41 +3,33 @@
 import { build, files, timestamp } from '$service-worker';
 const cacheName = `Mosasic${timestamp}`;
 
-self.addEventListener("install", (installEvent) => {
-
+self.addEventListener('install', (installEvent) => {
   installEvent.waitUntil(
-    caches.open(cacheName)
-      .then(cache => cache.addAll([...build, ...files, "/"]))
+    caches.open(cacheName).then((cache) => cache.addAll([...build, ...files, '/']))
   );
 
   self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
-	event.waitUntil(
-		caches.keys().then(async (keys) => {
-			// delete old caches
-			for (const key of keys) {
-				if (key !== cacheName) await caches.delete(key);
-			}
+  event.waitUntil(
+    caches.keys().then(async (keys) => {
+      // delete old caches
+      for (const key of keys) {
+        if (key !== cacheName) await caches.delete(key);
+      }
 
-			self.clients.claim();
-		})
-	);
+      self.clients.claim();
+    })
+  );
 });
 
-
-self.addEventListener("fetch", fetchEvent => {
-
-  const {request} = fetchEvent;
+self.addEventListener('fetch', (fetchEvent) => {
+  const { request } = fetchEvent;
   const url = new URL(request.url);
 
-  if (
-    url.pathname === '/' &&
-    url.searchParams.has('share-target') &&
-    request.method === 'POST'
-  ) {
-     // Redirect so the user can refresh the page without resending data.
+  if (url.pathname === '/' && url.searchParams.has('share-target') && request.method === 'POST') {
+    // Redirect so the user can refresh the page without resending data.
     fetchEvent.respondWith(Response.redirect('/?share-target'));
     fetchEvent.waitUntil(
       (async function () {
@@ -48,24 +40,23 @@ self.addEventListener("fetch", fetchEvent => {
         const data = await dataPromise;
         const file = data.get('file');
         client!.postMessage({ file, action: 'load-image' });
-      })(),
+      })()
     );
-    return ;
+    return;
   }
 
   fetchEvent.respondWith(
-    caches.open(cacheName)
-      .then(cache => cache.match(fetchEvent.request))
+    caches
+      .open(cacheName)
+      .then((cache) => cache.match(fetchEvent.request))
       .then((response) => {
         if (response) {
           return response;
         }
         return fetch(fetchEvent.request);
-      }
-    )
+      })
   );
 });
-
 
 const nextMessageResolveMap = new Map<string, (() => void)[]>();
 
@@ -74,7 +65,7 @@ const nextMessageResolveMap = new Map<string, (() => void)[]>();
  *
  * @param dataVal The event.data value.
  */
- function nextMessage(dataVal: string): Promise<void> {
+function nextMessage(dataVal: string): Promise<void> {
   return new Promise((resolve) => {
     if (!nextMessageResolveMap.has(dataVal)) {
       nextMessageResolveMap.set(dataVal, []);
@@ -89,4 +80,3 @@ self.addEventListener('message', (event) => {
   nextMessageResolveMap.delete(event.data);
   for (const resolve of resolvers) resolve();
 });
-
