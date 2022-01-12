@@ -16,13 +16,13 @@
   const onDownload = async (clickEvent) => {
     clickEvent.preventDefault();
     const newFile = await onDownloadHandler(clickEvent);
-    if (dummyDownloadElement.href != "") {
-        URL.revokeObjectURL(dummyDownloadElement.href)
+    if (dummyDownloadElement.href != '') {
+      URL.revokeObjectURL(dummyDownloadElement.href);
     }
     dummyDownloadElement.download = newFile.name;
     dummyDownloadElement.href = URL.createObjectURL(newFile);
     dummyDownloadElement.click();
-  }
+  };
 
   const disable = (element) => element.setAttribute('enabled', false);
   const enable = (element) => element.setAttribute('enabled', true);
@@ -55,7 +55,7 @@
 <a id="share" enabled={hasFile} bind:this={shareElement} on:click={share}>
   <img src="images/share_black_24dp.svg" alt="Share" />
 </a>
-<a id="dummyDownload" bind:this={dummyDownloadElement} download></a>
+<a id="dummyDownload" bind:this={dummyDownloadElement} download />
 
 <style>
   a[enabled='false'] {

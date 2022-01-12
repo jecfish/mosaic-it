@@ -43,17 +43,17 @@
   export function render() {
     return new Promise((resolve, reject) => {
       try {
-        const tmpCanvas = document.createElement("canvas")
+        const tmpCanvas = document.createElement('canvas');
         tmpCanvas.width = canvas.width;
         tmpCanvas.height = canvas.height;
 
-        const tmpCtx = tmpCanvas.getContext("2d");
+        const tmpCtx = tmpCanvas.getContext('2d');
         tmpCtx.drawImage(imgFile, 0, 0);
         tmpCtx.drawImage(canvas, 0, 0);
 
         tmpCanvas.toBlob(resolve);
       } catch (err) {
-        console.error(err)
+        console.error(err);
         reject(err);
       }
     });
@@ -172,7 +172,7 @@
 <div class="container">
   <div class="controls">
     <button on:click={mosaicIt}>Apply mosaic</button>
-    <button on:click={() => mask = !mask}>
+    <button on:click={() => (mask = !mask)}>
       {mask ? 'View masked' : 'View original'}
     </button>
   </div>
