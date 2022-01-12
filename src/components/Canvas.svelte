@@ -1,14 +1,16 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+import { xlink_attr } from 'svelte/internal';
   import { Rect } from '../classes/rect';
 
   /* Canvas */
   let imgFile: HTMLImageElement;
   let refresh = false;
   let mask = false;
+  let editorPanel: HTMLDivElement;
   let canvas;
   let ctx;
-  const storedRects = [];
+  let storedRects = [];
   let imgResizeObserver;
   const temptRect = new Rect();
 
@@ -20,8 +22,12 @@
     canvas.width = imgFile.width;
     canvas.height = imgFile.height;
 
-    storedRects.push(...rects);
+    storedRects = [...storedRects, ...rects];
     draw();
+
+    editorPanel.style.width = canvas.width + 'px';
+    editorPanel.style.height = canvas.height + 'px';
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // experiment pixelate
@@ -95,8 +101,10 @@
       } else if (mouse.up) {
         mouse.up = false;
         temptRect.update(mouse);
-        storedRects.push(new Rect(temptRect));
-        console.log(storedRects);
+        if(temptRect.w && temptRect.h) {
+          storedRects = [...storedRects, new Rect(temptRect)];
+        } 
+        // console.log(storedRects);
       }
       draw();
     }
@@ -108,6 +116,12 @@
     draw();
   }
 
+  function deleteRect(indexToRemove: number, e: Event) {
+    // e.preventDefault();
+    e.stopPropagation();
+    storedRects = storedRects.filter((_, i) => i !== indexToRemove);
+  }
+
   const mouse = {
     button: false,
     x: 0,
@@ -117,6 +131,8 @@
     element: null,
     bounds: null,
     event(e) {
+      // if (e?.target != canvas && e.type != 'mousedown') return;
+
       const m = mouse;
       m.bounds = m.element.getBoundingClientRect();
       m.x = e.pageX - m.bounds.left - scrollX;
@@ -177,7 +193,11 @@
     </button>
   </div>
   <div class="editor">
-    <!-- <div class='delete-buttons'></div> -->
+    <div bind:this={editorPanel} class="editor-panel" class:mask>
+      {#each storedRects as {x, y, w}, i}
+        <button on:click={(e) => deleteRect(i, e)} style="{ `left:${x+w}px;top:${y}px;` }">x</button>
+      {/each}
+    </div>
     <canvas bind:this={canvas} width={0} height={0} class:mask />
     <slot />
   </div>
@@ -201,12 +221,19 @@
     margin: 20px;
   }
 
-  /* .delete-buttons {
+  .editor-panel button {
     position: absolute;
-    background-color: black;
+    z-index: 1;
+    background: rgb(87 87 87 / 50%);
+    border: none;
+    color: white;
+  }
+
+  .editor-panel {
+    position: absolute;
     width: 60px;
     height: 60px;
-  } */
+  }
 
   canvas {
     padding: 0;
