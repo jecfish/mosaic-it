@@ -64,9 +64,10 @@
         const show = word.confidence < 70.0;
         const fill = false;
         const { x0: x, y0: y, x1, y1 } = word.bbox;
+        const text = word.text;
         const w = x1 - x;
         const h = y1 - y;
-        const rect = new Rect({ x, y, w, h, fill }, show);
+        const rect = new Rect({ x, y, w, h, text, fill }, show);
         rects.push(rect);
       });
     }

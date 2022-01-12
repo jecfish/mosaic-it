@@ -58,9 +58,9 @@
     let lineDash = [10, 5];
     ctx.strokeStyle = 'red';
 
-    storedRects.forEach((item) => {
-      const r = new Rect(item, true);
-      r.draw(ctx, { lineDash });
+    storedRects.forEach((rect) => {
+      console.log(rect);
+      rect.draw(ctx, { lineDash });
     });
     lineDash = [];
     temptRect.draw(ctx, { lineDash });
