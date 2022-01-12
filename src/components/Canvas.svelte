@@ -86,7 +86,7 @@
   }
 
   function mosaicIt() {
-    storedRects.map((item) => item.isSensitive(true));
+    storedRects.map((item) =>  item.fill = true);
     draw();
   }
 
