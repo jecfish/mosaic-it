@@ -2,12 +2,14 @@
   import { onMount } from 'svelte';
   import Canvas from '../components/Canvas.svelte';
   import Controls from '../components/Controls.svelte';
+  import { RingLoader } from 'svelte-loading-spinners';
   import { Rect } from '../classes/rect';
   import { createWorker } from 'tesseract.js';
 
   let droppedFile: HTMLImageElement;
   let fileUrl: string;
   let file: File;
+  let isLoadingMode: boolean = false;
   let isFileDropMode: boolean = true;
   let detectedWords: Tesseract.Word[] = [];
   const worker = createWorker();
@@ -45,11 +47,13 @@
       URL.revokeObjectURL(fileUrl);
     }
 
+    isLoadingMode = true;
+    isFileDropMode = false;
     const { words } = await detectText(file);
     detectedWords = words;
 
     fileUrl = URL.createObjectURL(file);
-    isFileDropMode = false;
+    isLoadingMode = false;
   }
 
   function drawImage() {
@@ -63,7 +67,6 @@
         const w = x1 - x;
         const h = y1 - y;
         const rect = new Rect({ x, y, w, h, fill }, show);
-        // Why can't I simply add a `Rect` instance???
         rects.push(rect);
       });
     }
@@ -92,6 +95,9 @@
     }
   </style>
 </svelte:head>
+<div class="spinner" class:hide={!isLoadingMode}>
+  <RingLoader size="60" color="#FF3E00" unit="px" duration="1s" />
+</div>
 <div class="canvas-container" class:hide={isFileDropMode}>
   <Canvas bind:this={canvasCmp} />
 </div>
@@ -152,6 +158,14 @@
     align-items: center;
     border: 10px dashed #b8daff;
     background: #f4f8ff;
+  }
+
+  .spinner {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .hide {
