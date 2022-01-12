@@ -5,6 +5,7 @@
   /* Canvas */
   let imgFile: HTMLImageElement;
   let refresh = false;
+  let mask = false;
   let canvas;
   let ctx;
   const storedRects = [];
@@ -88,15 +89,6 @@
     draw();
   }
 
-  function autoDetect() {
-    // TODO: Auto detect logic
-    // confirm case
-    storedRects.push(new Rect({ x: 252, y: 83, w: 27, h: 27, fill: true }));
-
-    // unsure case
-    storedRects.push(new Rect({ x: 122, y: 56, w: 44, h: 36, fill: false }));
-  }
-
   const mouse = {
     button: false,
     x: 0,
@@ -161,15 +153,22 @@
 <div class="container">
   <div class="controls">
     <button on:click={mosaicIt}>Apply mosaic</button>
-    <button on:click={autoDetect}>Auto detect mosaic area</button>
+    <button on:click={() => mask = !mask}>
+      {mask ? 'View masked' : 'View original'}
+    </button>
   </div>
   <div class="editor">
-    <canvas bind:this={canvas} width={0} height={0} />
+    <!-- <div class='delete-buttons'></div> -->
+    <canvas bind:this={canvas} width={0} height={0} class:mask />
     <slot />
   </div>
 </div>
 
 <style>
+  .mask {
+    opacity: 0;
+  }
+
   .container {
     display: flex;
     flex-direction: column;
@@ -182,6 +181,13 @@
   .controls {
     margin: 20px;
   }
+
+  /* .delete-buttons {
+    position: absolute;
+    background-color: black;
+    width: 60px;
+    height: 60px;
+  } */
 
   canvas {
     padding: 0;
