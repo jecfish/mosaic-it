@@ -1,8 +1,5 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import type { element } from 'svelte/internal';
-  import type { element } from 'svelte/internal';
-  import type { element } from 'svelte/internal';
 
   /* Canvas */
   let imgFile: HTMLImageElement;
@@ -16,7 +13,13 @@
     imgFile = img;
     // imgResizeObserver.observe(imgFile);
     refresh = true;
+
+    canvas.width = imgFile.width;
+    canvas.height = imgFile.height;
+    
     draw();
+    imgFile.style.display = 'none';
+  
     mouse.start(canvas);
     touch.start(canvas);
   }
@@ -26,15 +29,13 @@
     requestAnimationFrame(mainLoop);
 
     // TODO: Support resize and redraw
-    imgResizeObserver = new ResizeObserver((entries) => {
-      console.log('image resize:', entries);
-    });
+    // imgResizeObserver = new ResizeObserver((entries) => {
+    //   console.log('image resize:', entries);
+    // });
   });
 
   function draw() {
-    canvas.width = imgFile.width;
-    canvas.height = imgFile.height;
-
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(imgFile, 0, 0, canvas.width, canvas.height);
     let lineDash = [20, 5];
     storedRects.forEach((rect) => rect.draw(ctx, { lineDash }));
@@ -122,6 +123,7 @@
     down: false,
     up: false,
     element: null,
+    bounds: null,
     event(e) {
       const m = mouse;
       m.bounds = m.element.getBoundingClientRect();
@@ -147,7 +149,7 @@
   const touch = {
     element: null,
     event(e) {
-      e.preventDefault();
+      if (e.target == canvas) e.preventDefault();
 
       const t = e.touches.length ? e.touches[0] : e.changedTouches[0];
 
@@ -202,6 +204,9 @@
     position: relative;
     display: block;
     cursor: crosshair;
-    /* max-width: 100%; */
+
+    /* max-width: 100%;
+    max-height: 100%; */
   }
+
 </style>
