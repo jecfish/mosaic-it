@@ -3,8 +3,8 @@ type RectObject = {
   y: number;
   w: number;
   h: number;
-  text: string;
-  fill: boolean;
+  text?: string;
+  fill?: boolean;
 };
 
 export class Rect {
