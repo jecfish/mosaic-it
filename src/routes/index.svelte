@@ -53,7 +53,7 @@
   }
 
   function drawImage() {
-    const rects: any[] = [];
+    const rects: Rect[] = [];
     if (detectedWords.length !== 0) {
       detectedWords.forEach((word) => {
         console.log(word);
@@ -64,7 +64,7 @@
         const h = y1 - y;
         const rect = new Rect({ x, y, w, h, fill }, show);
         // Why can't I simply add a `Rect` instance???
-        rects.push(rect.toRect());
+        rects.push(rect);
       });
     }
     canvasCmp.init(droppedFile, rects);

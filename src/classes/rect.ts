@@ -1,32 +1,33 @@
+type RectObject = {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  fill: boolean;
+};
+
 export class Rect {
-  private x1;
-  private y1;
-  private x2;
-  private y2;
+  private x1: number;
+  private y1: number;
+  private x2: number;
+  private y2: number;
 
-  rect = {
-    x: 0,
-    y: 0,
-    w: 0,
-    h: 0,
-    fill: false
-  };
+  rect: RectObject;
+  show: boolean;
 
-  show = false;
-
-  constructor(rect = { x: 0, y: 0, w: 0, h: 0, fill: false }, show = false) {
+  constructor(rect: RectObject = { x: 0, y: 0, w: 0, h: 0, fill: false }, show = false) {
     this.rect = rect;
     this.show = show;
   }
 
-  private fix() {
+  private fix(): void {
     this.rect.x = Math.min(this.x1, this.x2);
     this.rect.y = Math.min(this.y1, this.y2);
     this.rect.w = Math.max(this.x1, this.x2) - Math.min(this.x1, this.x2);
     this.rect.h = Math.max(this.y1, this.y2) - Math.min(this.y1, this.y2);
   }
 
-  private _draw(ctx, { lineDash }) {
+  private _draw(ctx: CanvasRenderingContext2D, { lineDash }): void {
     ctx.setLineDash(lineDash);
 
     // mosaic it
@@ -54,14 +55,13 @@ export class Rect {
     this.show = true;
   }
 
-  toRect(): unknown {
-    this.show = false;
-    return { ...this.rect };
-  }
-
   draw(ctx: CanvasRenderingContext2D, options: { lineDash: number[] }): void {
     if (this.show) {
       this._draw(ctx, options);
     }
+  }
+
+  isSensitive(flag: boolean): void {
+    this.rect.fill = flag;
   }
 }
