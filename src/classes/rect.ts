@@ -23,6 +23,8 @@ export class Rect {
 
   show: boolean;
 
+  imageData: ImageData;
+
   constructor(rect: RectObject = { x: 0, y: 0, w: 0, h: 0, text: '', fill: false }, show = false) {
     for (const [key, value] of Object.entries(rect)) {
       this[key] = value;
@@ -44,9 +46,55 @@ export class Rect {
     // mosaic it
     if (this.fill) {
       ctx.fillStyle = 'black';
-      // ctx.globalAlpha = .2;
-      // ctx.filter = 'blur(10px)';
-      ctx.fillRect(this.x, this.y, this.w, this.h);
+      if(this.imageData != undefined) {
+        // do something
+        //ctx.fillStyle = 'green';
+        const { data, width, height } = this.imageData;
+
+        //const newImageData = new ImageData(width, height);
+        // experiment pixelate
+       
+        const sample_size = 10;
+
+        for (let y = 0; y < height; y += sample_size) {
+          for (let x = 0; x < width; x += sample_size) {
+            let p = (x + (y*width)) * 4; // start index
+            const sum = { r: 0, b: 0, g: 0, a: 0};
+            
+
+            for (let y1 = y; y1 < y + sample_size; y1++) {
+              for (let x1 = x; x1 < x + sample_size; x1++) {
+                let p1 = (x1 + (y1*width)) * 4; // start index
+                sum.r += data[p1];
+                sum.g += data[p1 + 1];
+                sum.b += data[p1 + 2];
+                sum.a += data[p1 + 3];
+              }
+            }
+
+            //average the colours...
+            sum.r = Math.floor(sum.r / ( sample_size * sample_size ))
+            sum.g = Math.floor(sum.g / ( sample_size * sample_size ))
+            sum.b = Math.floor(sum.b / ( sample_size * sample_size ))
+            sum.a = 255;
+
+            for (let y1 = y; y1 < y + sample_size; y1++) {
+              for (let x1 = x; x1 < x + sample_size; x1++) {
+                let p1 = (x1 + (y1*width)) * 4; // start index
+                this.imageData.data[p1] = sum.r;
+                this.imageData.data[p1 + 1] = sum.g;
+                this.imageData.data[p1 + 2] = sum.b;
+                this.imageData.data[p1 + 3] = sum.a;
+              }
+            }
+           
+            ctx.putImageData(this.imageData, this.x, this.y)
+          }
+        }
+
+      }
+     
+      //ctx.fillRect(this.x, this.y, this.w, this.h);
     } else {
       ctx.strokeRect(this.x, this.y, this.w, this.h);
     }

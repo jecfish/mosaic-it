@@ -6,8 +6,10 @@
   let imgFile: HTMLImageElement;
   let refresh = false;
   let mask = false;
-  let canvas;
+  let canvas: HTMLCanvasElement;
   let ctx;
+  let offscreen: HTMLCanvasElement;
+  let offscreenContext: CanvasRenderingContext2D;
   const storedRects = [];
   let imgResizeObserver;
   const temptRect = new Rect();
@@ -20,7 +22,12 @@
     canvas.width = imgFile.width;
     canvas.height = imgFile.height;
 
+    offscreen = canvas.cloneNode();
+    offscreenContext = offscreen.getContext('2d');
+    offscreenContext.drawImage(img, 0, 0);
+
     storedRects.push(...rects);
+
     draw();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -78,7 +85,13 @@
     ctx.strokeStyle = 'red';
 
     storedRects.forEach((rect) => {
-      new Rect(rect, true).draw(ctx, { lineDash });
+      const newRect = new Rect(rect, true);
+      // kludge
+      if (rect.y <0) {
+        return;
+      }
+      newRect.imageData = offscreenContext.getImageData(rect.x, rect.y, rect.w, rect.h);
+      newRect.draw(ctx, { lineDash });
     });
     lineDash = [];
     temptRect.draw(ctx, { lineDash });
