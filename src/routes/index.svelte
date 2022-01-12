@@ -11,7 +11,7 @@
   let file: File;
   let isLoadingMode: boolean = false;
   let isFileDropMode: boolean = true;
-  let detectedWords: Tesseract.Word[] = [];
+  let detectedWords: Rect[] = [];
   const worker = createWorker();
 
   let canvasCmp;
@@ -32,13 +32,39 @@
     navigator.serviceWorker.controller?.postMessage('share-ready');
   });
 
-  async function detectText(file: File): Promise<Tesseract.Page> {
+  async function detectText(file: File): Promise<Rect[]> {
     await worker.load();
     await worker.loadLanguage('eng');
     await worker.initialize('eng');
     const { data } = await worker.recognize(file);
     await worker.terminate();
-    return data;
+
+    const words: Tesseract.Word[] = data.words.filter((word) => {
+      // The words must be at least 3 characters long.
+      return word.text.length > 2;
+    });
+    const rects: Rect[] = words.map((word) => {
+      const show = word.confidence > 70.0;
+      const text = word.text.trim();
+      let sensitive = false;
+      // if isSentiveData then fill = true
+      if (
+        /^[0-9-]+$/.test(text) ||
+        /^[a-zA-Z0-9_.+-]+@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$/.test(text)
+      ) {
+        sensitive = true;
+      }
+      const { x0: x, y0: y, x1, y1 } = word.bbox;
+      const w = x1 - x;
+      const h = y1 - y;
+      if (sensitive) {
+        console.log(`"${text}"`, `considered sensitive`);
+      } else {
+        console.log(`"${text}"`);
+      }
+      return new Rect({ x, y, w, h, text, fill: sensitive }, sensitive);
+    });
+    return rects;
   }
 
   async function handleFileDrop(fileDropEvent): Promise<void> {
@@ -49,8 +75,7 @@
 
     isLoadingMode = true;
     isFileDropMode = false;
-    const { words } = await detectText(file);
-    detectedWords = words;
+    detectedWords = await detectText(file);
 
     fileUrl = URL.createObjectURL(file);
     isLoadingMode = false;
@@ -58,21 +83,7 @@
 
   function drawImage() {
     const rects: Rect[] = [];
-    if (detectedWords.length !== 0) {
-      detectedWords.forEach((word) => {
-        console.log(word);
-        // if isSentiveData then fill = true
-        // word.confidence < 70.0;
-        const fill = false;
-        const { x0: x, y0: y, x1, y1 } = word.bbox;
-        const text = word.text;
-        const w = x1 - x;
-        const h = y1 - y;
-        const rect = new Rect({ x, y, w, h, text, fill });
-        rects.push(rect);
-      });
-    }
-    canvasCmp.init(droppedFile, rects);
+    canvasCmp.init(droppedFile, detectedWords);
   }
 </script>
 
