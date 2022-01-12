@@ -87,11 +87,11 @@
 	{/if}
 </file-drop>
 
-<div id="control-container"><Controls file={file} fileUrl={fileUrl}/></div>
+<div id="control-container"><Controls {file} {fileUrl} /></div>
 
 <style>
 	#control-container {
-		position:absolute;
+		position: absolute;
 		bottom: 0;
 		right: 0;
 		margin: 2em;
