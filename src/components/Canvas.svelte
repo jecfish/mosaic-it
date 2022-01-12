@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { Rect } from '../classes/rect';
 
   /* Canvas */
   let imgFile: HTMLImageElement;
@@ -8,6 +9,7 @@
   let ctx;
   const storedRects = [];
   let imgResizeObserver;
+  const temptRect = new Rect();
 
   export function init(img) {
     imgFile = img;
@@ -38,10 +40,13 @@
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(imgFile, 0, 0, canvas.width, canvas.height);
     let lineDash = [20, 5];
-    storedRects.forEach((rect) => rect.draw(ctx, { lineDash }));
+    storedRects.forEach((item) => {
+      const r = new Rect(item, true);
+      r.draw(ctx, { lineDash });
+    });
     // ctx.strokeStyle = 'red';
     lineDash = [];
-    rect.draw(ctx, { lineDash });
+    temptRect.draw(ctx, { lineDash });
   }
 
   function mainLoop() {
@@ -49,13 +54,14 @@
       refresh = false;
       if (mouse.down) {
         mouse.down = false;
-        rect.restart(mouse);
+        temptRect.restart(mouse);
       } else if (mouse.button) {
-        rect.update(mouse);
+        temptRect.update(mouse);
       } else if (mouse.up) {
         mouse.up = false;
-        rect.update(mouse);
-        storedRects.push(rect.toRect());
+        temptRect.update(mouse);
+        storedRects.push(temptRect.toRect());
+        // console.log(storedRects);
       }
       draw();
     }
@@ -63,58 +69,18 @@
   }
 
   function mosaicIt() {
-    storedRects.forEach((rect) => (rect.fill = true));
+    storedRects.forEach((item) => (item.fill = true));
+    draw();
   }
 
-  const rect = (() => {
-    let x1, y1, x2, y2;
-    let show = false;
-    function fix() {
-      rect.x = Math.min(x1, x2);
-      rect.y = Math.min(y1, y2);
-      rect.w = Math.max(x1, x2) - Math.min(x1, x2);
-      rect.h = Math.max(y1, y2) - Math.min(y1, y2);
-    }
-    function draw(ctx, { lineDash }) {
-      ctx.setLineDash(lineDash);
+  function autoDetect() {
+    // TODO: Auto detect logic
+    // confirm case
+    storedRects.push({ x: 252, y: 83, w: 27, h: 27, fill: true});
 
-      // mosaic it
-      if (this.fill) {
-        ctx.fillStyle = 'white';
-        // ctx.globalAlpha = .2;
-        // ctx.filter = 'blur(10px)';
-        ctx.fillRect(this.x, this.y, this.w, this.h);
-      } else {
-        ctx.strokeRect(this.x, this.y, this.w, this.h);
-      }
-    }
-    const rect = { x: 0, y: 0, w: 0, h: 0, draw };
-    const API = {
-      restart(point) {
-        x2 = x1 = point.x;
-        y2 = y1 = point.y;
-        fix();
-        show = true;
-      },
-      update(point) {
-        x2 = point.x;
-        y2 = point.y;
-        fix();
-        show = true;
-      },
-      toRect() {
-        show = false;
-        return Object.assign({}, rect);
-      },
-      draw(ctx, options) {
-        if (show) {
-          rect.draw(ctx, options);
-        }
-      },
-      show: false
-    };
-    return API;
-  })();
+    // unsure case
+    storedRects.push({ x: 122, y: 56, w: 44, h: 36, fill: false});
+  }
 
   const mouse = {
     button: false,
@@ -179,7 +145,8 @@
 
 <div class="container">
   <div class="controls">
-    <button on:click={mosaicIt}>Apply</button>
+    <button on:click={mosaicIt}>Apply mosaic</button>
+    <button on:click={autoDetect}>Auto detect mosaic area</button>
   </div>
   <canvas bind:this={canvas} width={0} height={0} />
 </div>
