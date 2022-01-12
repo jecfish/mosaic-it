@@ -59,8 +59,7 @@
     ctx.strokeStyle = 'red';
 
     storedRects.forEach((rect) => {
-      console.log(rect);
-      rect.draw(ctx, { lineDash });
+      new Rect(rect, true).draw(ctx, { lineDash });
     });
     lineDash = [];
     temptRect.draw(ctx, { lineDash });
