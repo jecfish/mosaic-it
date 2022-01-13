@@ -46,7 +46,17 @@
 
         const tmpCtx = tmpCanvas.getContext('2d');
         tmpCtx.drawImage(imgFile, 0, 0);
-        tmpCtx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, tmpCanvas.width, tmpCanvas.height);
+        tmpCtx.drawImage(
+          canvas,
+          0,
+          0,
+          canvas.width,
+          canvas.height,
+          0,
+          0,
+          tmpCanvas.width,
+          tmpCanvas.height
+        );
 
         tmpCanvas.toBlob(resolve);
       } catch (err) {
