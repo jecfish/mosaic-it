@@ -9,24 +9,33 @@
   let editorPanel: HTMLDivElement;
   let canvas: HTMLCanvasElement;
   let ctx: CanvasRenderingContext2D;
-  let offscreenContext: CanvasRenderingContext2D;
+  let pixCtx: CanvasRenderingContext2D;
+  let pixSize = 1;
   let storedRects: Rect[] = [];
   let scaleFactor: number = 1;
   let imgResizeObserver: ResizeObserver;
   const temptRect = new Rect();
+  const pixels = 50; // pixeleration density
 
   export function init(img, rects: Rect[] = []) {
     imgFile = img;
     refresh = true;
 
-    canvas.width = imgFile.width;
-    canvas.height = imgFile.height;
+    const { width, height } = imgFile;
 
-    const offscreen = <HTMLCanvasElement>canvas.cloneNode();
-    offscreen.width = imgFile.width;
-    offscreen.height = imgFile.height;
-    offscreenContext = offscreen.getContext('2d');
-    offscreenContext.drawImage(img, 0, 0);
+    canvas.width = width;
+    canvas.height = height;
+
+    // Devide by smaller number to determine the pixel size.
+    pixSize = width > height ? height / pixels : width / pixels;
+    const scaledWidth = Math.floor(width / pixSize);
+    const scaledHeight = Math.floor(height / pixSize);
+
+    const pixCanvas = document.createElement('canvas');
+    pixCanvas.width = pixels;
+    pixCanvas.height = scaledHeight;
+    pixCtx = pixCanvas.getContext('2d');
+    pixCtx.drawImage(img, 0, 0, pixels, scaledHeight);
 
     storedRects = [...storedRects, ...rects];
 
@@ -98,15 +107,14 @@
     ctx.rect(0, 0, canvas.width, canvas.height);
 
     storedRects.forEach((rect) => {
-      const newRect = new Rect(rect, true);
       // kludge
       if (rect.y < 0) {
         return;
       }
-      if (newRect.fill) {
-        pixelerate(newRect);
+      if (rect.fill) {
+        pixelerate(rect);
       }
-      drawRect(newRect, [10, 5]);
+      drawRect(rect, [10, 5]);
     });
     drawRect(temptRect, []);
   }
@@ -141,32 +149,16 @@
   }
 
   async function pixelerate(rect: Rect): Promise<void> {
-    const pixels = 10;
-    const imageBitmap = await createImageBitmap(
-      offscreenContext.canvas,
-      rect.x,
-      rect.y,
-      rect.w,
-      rect.h
-    );
-    const { width, height } = imageBitmap;
-
-    const widthScale = pixels / width;
-    const scaledHeight = Math.floor(height * widthScale) || 1;
-
-    const tmpCanvas = document.createElement('canvas');
-    tmpCanvas.width = pixels;
-    tmpCanvas.height = scaledHeight;
-    const tmpCtx = tmpCanvas.getContext('2d');
-
-    // Draw the image onto a smaller canvas temporarily.
-    tmpCtx.drawImage(imageBitmap, 0, 0, pixels, scaledHeight);
+    const pixX = Math.floor(rect.orig.x / pixSize);
+    const pixY = Math.floor(rect.orig.y / pixSize);
+    const pixW = Math.floor(rect.orig.w / pixSize) || 1;
+    const pixH = Math.floor(rect.orig.h / pixSize) || 1;
 
     // Enable pixeleration by disabling smoothing.
     ctx.imageSmoothingEnabled = false;
     // Draw the smaller image onto the canvas with the original size so that
     // it's pixelerated.
-    ctx.drawImage(tmpCtx.canvas, 0, 0, pixels, scaledHeight, rect.x, rect.y, rect.w, rect.h);
+    ctx.drawImage(pixCtx.canvas, pixX, pixY, pixW, pixH, rect.x, rect.y, rect.w, rect.h);
     ctx.imageSmoothingEnabled = true;
   }
 
@@ -176,6 +168,7 @@
       e.preventDefault();
       e.stopPropagation();
       storedRects[rectIndex].toggleSensitive();
+      e.target.classList.toggle('fill');
       draw();
     };
   }
@@ -263,9 +256,9 @@
 <div class="container">
   <div class="editor">
     <div bind:this={editorPanel} class="editor-panel" class:mask name="map-panel">
-      {#each storedRects as { x, y, w, h, text }, i}
+      {#each storedRects as { x, y, w, h, text, fill }, i}
         <button
-          class="rect"
+          class="rect {fill ? 'fill' : ''}"
           style={`left:${x}px;top:${y}px;width:${w}px;height:${h}px`}
           on:click={toggleMosaic(i)}
         />
@@ -301,7 +294,12 @@
   }
 
   .editor-panel button.rect {
-    background: rgb(87 87 87 / 20%);
+    border: 1px solid rgb(87 87 87 / 50%);
+    background: rgb(87 87 87 / 10%);
+  }
+
+  .editor-panel button.fill {
+    border: none;
   }
 
   .editor-panel {

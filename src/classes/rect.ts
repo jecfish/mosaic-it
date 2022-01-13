@@ -25,13 +25,14 @@ export class Rect {
 
   drawing: boolean;
 
-  imageData: ImageData;
+  orig: RectObject;
 
   constructor(rect: RectObject = { x: 0, y: 0, w: 0, h: 0, text: '', fill: false }, show = false) {
     for (const [key, value] of Object.entries(rect)) {
       this[key] = value;
     }
 
+    this.orig = Object.assign({}, rect);
     this.show = show;
     this.drawing = false;
   }
