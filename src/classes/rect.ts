@@ -89,8 +89,6 @@ export class Rect {
           }
         }
       }
-    } else {
-      ctx.strokeRect(this.x, this.y, this.w, this.h);
     }
   }
 

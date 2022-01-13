@@ -259,15 +259,14 @@
     color: white;
   }
 
+  .editor-panel button.rect {
+    background: rgb(87 87 87 / 20%);
+  }
+
   .editor-panel {
     position: absolute;
     width: 60px;
     height: 60px;
-  }
-
-  .rect {
-    position: absolute;
-    background: rgb(87 87 87 / 20%);
   }
 
   canvas {
