@@ -94,6 +94,10 @@
 
 <svelte:head>
   <style>
+    :root {
+      --mdc-theme-secondary: hotpink;
+    }
+
     html,
     body {
       margin: 0;
@@ -114,7 +118,7 @@
   </style>
 </svelte:head>
 <div class="spinner" class:hide={!isLoadingMode}>
-  <RingLoader size="60" color="#FF3E00" unit="px" duration="1s" />
+  <RingLoader size="60" color="hotpink" unit="px" duration="1s" />
 </div>
 <div class="canvas-container" class:hide={isFileDropMode || isLoadingMode}>
   <Canvas bind:this={canvasCmp} bind:value={mask}>
