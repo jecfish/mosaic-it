@@ -1,6 +1,5 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { xlink_attr } from 'svelte/internal';
   import { Rect } from '../classes/rect';
 
   /* Canvas */
@@ -13,13 +12,12 @@
   let offscreen: HTMLCanvasElement;
   let offscreenContext: CanvasRenderingContext2D;
   let storedRects = [];
-
+  let scaleFactor = 1;
   let imgResizeObserver;
   const temptRect = new Rect();
 
   export function init(img, rects: Rect[] = []) {
     imgFile = img;
-    // imgResizeObserver.observe(imgFile);
     refresh = true;
 
     canvas.width = imgFile.width;
@@ -30,24 +28,10 @@
     offscreenContext.drawImage(img, 0, 0);
 
     storedRects = [...storedRects, ...rects];
-    draw();
 
-    editorPanel.style.width = canvas.width + 'px';
-    editorPanel.style.height = canvas.height + 'px';
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // experiment pixelate
-    // console.log(ctx.getImageData( 0, 0, canvas.width, canvas.height).data);
-    // const sample_size = 80;
-
-    // for (let y = 0; y < h; y += sample_size) {
-    //   for (let x = 0; x < w; x += sample_size) {
-    //     let p = (x + (y*w)) * 4;
-    //     ctx.fillStyle = "rgba(" + pixelArr[p] + "," + pixelArr[p + 1] + "," + pixelArr[p + 2] + "," + pixelArr[p + 3] + ")";
-    //     ctx.fillRect(x, y, sample_size, sample_size);
-    //   }
-    // }
+    imgResizeObserver.observe(imgFile);
+    imgFile.style.maxWidth = '96vw';
+    imgFile.style.maxHeight = '90vh';
 
     mouse.start(canvas);
     touch.start(canvas);
@@ -57,12 +41,22 @@
     return new Promise((resolve, reject) => {
       try {
         const tmpCanvas = document.createElement('canvas');
-        tmpCanvas.width = canvas.width;
-        tmpCanvas.height = canvas.height;
+        tmpCanvas.width = imgFile.naturalWidth;
+        tmpCanvas.height = imgFile.naturalHeight;
 
         const tmpCtx = tmpCanvas.getContext('2d');
         tmpCtx.drawImage(imgFile, 0, 0);
-        tmpCtx.drawImage(canvas, 0, 0);
+        tmpCtx.drawImage(
+          canvas,
+          0,
+          0,
+          canvas.width,
+          canvas.height,
+          0,
+          0,
+          tmpCanvas.width,
+          tmpCanvas.height
+        );
 
         tmpCanvas.toBlob(resolve);
       } catch (err) {
@@ -76,10 +70,25 @@
     ctx = canvas.getContext('2d');
     requestAnimationFrame(mainLoop);
 
-    // TODO: Support resize and redraw
-    // imgResizeObserver = new ResizeObserver((entries) => {
-    //   console.log('image resize:', entries);
-    // });
+    imgResizeObserver = new ResizeObserver(() => {
+      scaleFactor = imgFile.width / canvas.width;
+
+      storedRects = storedRects.map((item) => {
+        item.x = item.x * scaleFactor;
+        item.y = item.y * scaleFactor;
+        item.w = item.w * scaleFactor;
+        item.h = item.h * scaleFactor;
+        return item;
+      });
+
+      canvas.width = imgFile.width;
+      canvas.height = imgFile.height;
+
+      editorPanel.style.width = canvas.width + 'px';
+      editorPanel.style.height = canvas.height + 'px';
+
+      draw();
+    });
   });
 
   function draw() {
