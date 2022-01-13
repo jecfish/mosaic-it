@@ -113,7 +113,7 @@
         temptRect.update(mouse);
       } else if (mouse.up) {
         mouse.up = false;
-        temptRect.update(mouse);
+        temptRect.release(mouse);
         if (temptRect.w && temptRect.h) {
           storedRects = [...storedRects, new Rect(temptRect)];
         }

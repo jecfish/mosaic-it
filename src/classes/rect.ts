@@ -23,6 +23,8 @@ export class Rect {
 
   show: boolean;
 
+  drawing: boolean;
+
   imageData: ImageData;
 
   constructor(rect: RectObject = { x: 0, y: 0, w: 0, h: 0, text: '', fill: false }, show = false) {
@@ -31,6 +33,7 @@ export class Rect {
     }
 
     this.show = show;
+    this.drawing = false;
   }
 
   private fix(): void {
@@ -89,6 +92,8 @@ export class Rect {
           }
         }
       }
+    } else if (this.drawing) {
+      ctx.strokeRect(this.x, this.y, this.w, this.h);
     }
   }
 
@@ -97,6 +102,7 @@ export class Rect {
     this.y2 = this.y1 = point.y;
     this.fix();
     this.show = true;
+    this.drawing = true;
   }
 
   update(point: { x: number; y: number }): void {
@@ -104,6 +110,11 @@ export class Rect {
     this.y2 = point.y;
     this.fix();
     this.show = true;
+  }
+
+  release(point: { x: number; y: number }): void {
+    this.drawing = false;
+    this.update(point);
   }
 
   draw(ctx: CanvasRenderingContext2D, options: { lineDash: number[] }): void {
