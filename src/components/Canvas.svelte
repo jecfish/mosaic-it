@@ -33,18 +33,6 @@
     imgFile.style.maxWidth = '96vw';
     imgFile.style.maxHeight = '90vh';
 
-    // experiment pixelate
-    // console.log(ctx.getImageData( 0, 0, canvas.width, canvas.height).data);
-    // const sample_size = 80;
-
-    // for (let y = 0; y < h; y += sample_size) {
-    //   for (let x = 0; x < w; x += sample_size) {
-    //     let p = (x + (y*w)) * 4;
-    //     ctx.fillStyle = "rgba(" + pixelArr[p] + "," + pixelArr[p + 1] + "," + pixelArr[p + 2] + "," + pixelArr[p + 3] + ")";
-    //     ctx.fillRect(x, y, sample_size, sample_size);
-    //   }
-    // }
-
     mouse.start(canvas);
     touch.start(canvas);
   }
@@ -53,12 +41,12 @@
     return new Promise((resolve, reject) => {
       try {
         const tmpCanvas = document.createElement('canvas');
-        tmpCanvas.width = canvas.width;
-        tmpCanvas.height = canvas.height;
+        tmpCanvas.width = imgFile.naturalWidth;
+        tmpCanvas.height = imgFile.naturalHeight;
 
         const tmpCtx = tmpCanvas.getContext('2d');
         tmpCtx.drawImage(imgFile, 0, 0);
-        tmpCtx.drawImage(canvas, 0, 0);
+        tmpCtx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, tmpCanvas.width, tmpCanvas.height);
 
         tmpCanvas.toBlob(resolve);
       } catch (err) {
