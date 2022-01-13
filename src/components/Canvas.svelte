@@ -1,6 +1,5 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { xlink_attr } from 'svelte/internal';
   import { Rect } from '../classes/rect';
 
   /* Canvas */
@@ -13,13 +12,12 @@
   let offscreen: HTMLCanvasElement;
   let offscreenContext: CanvasRenderingContext2D;
   let storedRects = [];
-
+  let scaleFactor = 1;
   let imgResizeObserver;
   const temptRect = new Rect();
 
   export function init(img, rects: Rect[] = []) {
     imgFile = img;
-    // imgResizeObserver.observe(imgFile);
     refresh = true;
 
     canvas.width = imgFile.width;
@@ -30,12 +28,10 @@
     offscreenContext.drawImage(img, 0, 0);
 
     storedRects = [...storedRects, ...rects];
-    draw();
 
-    editorPanel.style.width = canvas.width + 'px';
-    editorPanel.style.height = canvas.height + 'px';
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    imgResizeObserver.observe(imgFile);
+    imgFile.style.maxWidth = '96vw';
+    imgFile.style.maxHeight = '90vh';
 
     // experiment pixelate
     // console.log(ctx.getImageData( 0, 0, canvas.width, canvas.height).data);
@@ -76,10 +72,25 @@
     ctx = canvas.getContext('2d');
     requestAnimationFrame(mainLoop);
 
-    // TODO: Support resize and redraw
-    // imgResizeObserver = new ResizeObserver((entries) => {
-    //   console.log('image resize:', entries);
-    // });
+    imgResizeObserver = new ResizeObserver(() => {
+      scaleFactor = imgFile.width / canvas.width;
+
+      storedRects = storedRects.map((item) => {
+        item.x = item.x * scaleFactor;
+        item.y = item.y * scaleFactor;
+        item.w = item.w * scaleFactor;
+        item.h = item.h * scaleFactor;
+        return item;
+      });
+
+      canvas.width = imgFile.width;
+      canvas.height = imgFile.height;
+
+      editorPanel.style.width = canvas.width + 'px';
+      editorPanel.style.height = canvas.height + 'px';
+
+      draw();
+    });
   });
 
   function draw() {

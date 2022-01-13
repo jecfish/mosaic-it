@@ -105,11 +105,11 @@ export class Rect {
     this.drawing = true;
   }
 
-  update(point: { x: number; y: number }): void {
+  update(point: { x: number; y: number }, show = undefined): void {
     this.x2 = point.x;
     this.y2 = point.y;
     this.fix();
-    this.show = true;
+    this.show = show == undefined ? true : show;
   }
 
   release(point: { x: number; y: number }): void {
