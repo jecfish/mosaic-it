@@ -8,12 +8,11 @@
   let mask;
   let editorPanel: HTMLDivElement;
   let canvas: HTMLCanvasElement;
-  let ctx;
-  let offscreen: HTMLCanvasElement;
+  let ctx: CanvasRenderingContext2D;
   let offscreenContext: CanvasRenderingContext2D;
-  let storedRects = [];
-  let scaleFactor = 1;
-  let imgResizeObserver;
+  let storedRects: Rect[] = [];
+  let scaleFactor: number = 1;
+  let imgResizeObserver: ResizeObserver;
   const temptRect = new Rect();
 
   export function init(img, rects: Rect[] = []) {
@@ -23,7 +22,9 @@
     canvas.width = imgFile.width;
     canvas.height = imgFile.height;
 
-    offscreen = canvas.cloneNode();
+    const offscreen = <HTMLCanvasElement>canvas.cloneNode();
+    offscreen.width = imgFile.width;
+    offscreen.height = imgFile.height;
     offscreenContext = offscreen.getContext('2d');
     offscreenContext.drawImage(img, 0, 0);
 
@@ -96,20 +97,18 @@
     // ctx.stroke();
     ctx.rect(0, 0, canvas.width, canvas.height);
 
-    let lineDash = [10, 5];
-    ctx.strokeStyle = 'red';
-
     storedRects.forEach((rect) => {
       const newRect = new Rect(rect, true);
       // kludge
       if (rect.y < 0) {
         return;
       }
-      newRect.imageData = offscreenContext.getImageData(rect.x, rect.y, rect.w, rect.h);
-      newRect.draw(ctx, { lineDash });
+      if (newRect.fill) {
+        pixelerate(newRect);
+      }
+      drawRect(newRect, [10, 5]);
     });
-    lineDash = [];
-    temptRect.draw(ctx, { lineDash });
+    drawRect(temptRect, []);
   }
 
   function mainLoop() {
@@ -131,6 +130,44 @@
       draw();
     }
     requestAnimationFrame(mainLoop);
+  }
+
+  function drawRect(rect: Rect, lineDash: number[]) {
+    if (rect.drawing) {
+      ctx.strokeStyle = 'red';
+      ctx.setLineDash(lineDash);
+      ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
+    }
+  }
+
+  async function pixelerate(rect: Rect): Promise<void> {
+    const pixels = 10;
+    const imageBitmap = await createImageBitmap(
+      offscreenContext.canvas,
+      rect.x,
+      rect.y,
+      rect.w,
+      rect.h
+    );
+    const { width, height } = imageBitmap;
+
+    const widthScale = pixels / width;
+    const scaledHeight = Math.floor(height * widthScale) || 1;
+
+    const tmpCanvas = document.createElement('canvas');
+    tmpCanvas.width = pixels;
+    tmpCanvas.height = scaledHeight;
+    const tmpCtx = tmpCanvas.getContext('2d');
+
+    // Draw the image onto a smaller canvas temporarily.
+    tmpCtx.drawImage(imageBitmap, 0, 0, pixels, scaledHeight);
+
+    // Enable pixeleration by disabling smoothing.
+    ctx.imageSmoothingEnabled = false;
+    // Draw the smaller image onto the canvas with the original size so that
+    // it's pixelerated.
+    ctx.drawImage(tmpCtx.canvas, 0, 0, pixels, scaledHeight, rect.x, rect.y, rect.w, rect.h);
+    ctx.imageSmoothingEnabled = true;
   }
 
   function toggleMosaic(i) {
