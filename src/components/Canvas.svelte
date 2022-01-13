@@ -269,7 +269,7 @@
           style={`left:${x}px;top:${y}px;width:${w}px;height:${h}px`}
           on:click={toggleMosaic(i)}
         />
-        <button on:click={(e) => deleteRect(i, e)} style={`left:${x}px;top:${y}px;`}>x</button>
+        <button on:click={(e) => deleteRect(i, e)} style={`left:${x + w}px;top:${y}px;`}>x</button>
       {/each}
     </div>
     <canvas bind:this={canvas} width={0} height={0} class:mask />

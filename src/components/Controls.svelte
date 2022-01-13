@@ -29,7 +29,7 @@
   };
   const toggleHide = () => {
     mask = !mask;
-    visibility = mask ? 'visibility' : 'visibility_off';
+    visibility = mask ? 'visibility_off' : 'visibility';
     dispatch('toggleMask');
   };
 
