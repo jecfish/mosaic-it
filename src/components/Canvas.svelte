@@ -129,6 +129,16 @@
     draw();
   }
 
+  function toggleMosaic(i) {
+    const rectIndex = i;
+    return (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      storedRects[rectIndex].toggleSensitive();
+      draw();
+    };
+  }
+
   function deleteRect(indexToRemove: number, e: Event) {
     // e.preventDefault();
     e.stopPropagation();
@@ -213,9 +223,10 @@
     </button>
   </div>
   <div class="editor">
-    <div bind:this={editorPanel} class="editor-panel" class:mask>
-      {#each storedRects as { x, y, w }, i}
-        <button on:click={(e) => deleteRect(i, e)} style={`left:${x + w}px;top:${y}px;`}>x</button>
+    <div bind:this={editorPanel} class="editor-panel" class:mask name="map-panel">
+      {#each storedRects as { x, y, w, h, text }, i}
+        <button class="rect" style={`left:${x}px;top:${y}px;width:${w}px;height:${h}px`} on:click={toggleMosaic(i)}></button>
+        <button on:click={(e) => deleteRect(i, e)} style={`left:${x}px;top:${y}px;`}>x</button>
       {/each}
     </div>
     <canvas bind:this={canvas} width={0} height={0} class:mask />
@@ -253,6 +264,14 @@
     position: absolute;
     width: 60px;
     height: 60px;
+  }
+
+  button {
+    cursor: pointer;
+  }
+  
+  .rect {
+    position: absolute;
   }
 
   canvas {

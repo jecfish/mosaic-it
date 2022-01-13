@@ -114,7 +114,7 @@ export class Rect {
     }
   }
 
-  isSensitive(flag: boolean): void {
-    this.fill = flag;
+  toggleSensitive(): void {
+    this.fill = !this.fill;
   }
 }
