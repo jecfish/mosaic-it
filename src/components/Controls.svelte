@@ -1,7 +1,5 @@
-<script>
-  import { onMount } from 'svelte';
-  import '@material/mwc-fab';
-  import '@material/mwc-icon';
+<script lang="ts">
+  import { onMount, createEventDispatcher } from 'svelte';
 
   export let file;
   export let fileUrl;
@@ -15,7 +13,9 @@
   let dummyDownloadElement;
   let visibility = 'visibility_off';
 
-  const reload = () => (window.location = window.location);
+  const dispatch = createEventDispatcher();
+
+  let reload;
   const share = () => navigator.share({ files: [file] });
   const onDownload = async (clickEvent) => {
     clickEvent.preventDefault();
@@ -30,6 +30,7 @@
   const toggleHide = () => {
     mask = !mask;
     visibility = mask ? 'visibility' : 'visibility_off';
+    dispatch('toggleMask');
   };
 
   const disable = (element) => element.setAttribute('enabled', false);
@@ -37,7 +38,12 @@
 
   $: hasFile = fileUrl != undefined;
 
-  onMount(() => {
+  onMount(async () => {
+    await import('@material/mwc-fab');
+    await import('@material/mwc-icon');
+
+    reload = () => (window.location = window.location);
+
     const nullTarget = { files: [new File([], 'test.png', { type: 'image/png' })] };
     if (fileUrl == undefined) {
       disable(downloadElement);

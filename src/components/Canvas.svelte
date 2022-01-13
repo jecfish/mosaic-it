@@ -5,7 +5,7 @@
   /* Canvas */
   let imgFile: HTMLImageElement;
   let refresh = false;
-  export let mask;
+  let mask;
   let editorPanel: HTMLDivElement;
   let canvas: HTMLCanvasElement;
   let ctx;
@@ -64,10 +64,6 @@
         reject(err);
       }
     });
-  }
-
-  export function hide(hidden: boolean) {
-    mask = hidden;
   }
 
   onMount(() => {
@@ -151,6 +147,10 @@
     // e.preventDefault();
     e.stopPropagation();
     storedRects = storedRects.filter((_, i) => i !== indexToRemove);
+  }
+
+  export function toggleMask() {
+    mask = !mask;
   }
 
   const mouse = {

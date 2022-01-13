@@ -90,6 +90,10 @@
   function download() {
     return canvasCmp.render().then((blob) => new File([blob], 'final.png', { type: 'image/png' }));
   }
+
+  function toggleMask(event) {
+    canvasCmp.toggleMask();
+  }
 </script>
 
 <svelte:head>
@@ -117,7 +121,7 @@
   <RingLoader size="60" color="#FF3E00" unit="px" duration="1s" />
 </div>
 <div class="canvas-container" class:hide={isFileDropMode || isLoadingMode}>
-  <Canvas bind:this={canvasCmp} bind:value={mask}>
+  <Canvas bind:this={canvasCmp}>
     {#if fileUrl != undefined}
       <!-- disable resize -->
       <!-- style="max-width:100%;max-height:90vh;" -->
@@ -146,7 +150,9 @@
   </file-drop>
 {/if}
 
-<div id="control-container"><Controls {file} {fileUrl} {mask} onDownloadHandler={download} /></div>
+<div id="control-container">
+  <Controls {file} {fileUrl} onDownloadHandler={download} on:toggleMask={toggleMask} />
+</div>
 
 <style>
   #control-container {
