@@ -1,8 +1,11 @@
 <script>
   import { onMount } from 'svelte';
+  import '@material/mwc-fab';
+  import '@material/mwc-icon';
 
   export let file;
   export let fileUrl;
+  export let mask = false;
   export let onDownloadHandler = async (event) => {
     console.log(event);
   };
@@ -10,6 +13,7 @@
   let shareElement;
   let downloadElement;
   let dummyDownloadElement;
+  let visibility = 'visibility_off';
 
   const reload = () => (window.location = window.location);
   const share = () => navigator.share({ files: [file] });
@@ -22,6 +26,10 @@
     dummyDownloadElement.download = newFile.name;
     dummyDownloadElement.href = URL.createObjectURL(newFile);
     dummyDownloadElement.click();
+  };
+  const toggleHide = () => {
+    mask = !mask;
+    visibility = mask ? 'visibility' : 'visibility_off';
   };
 
   const disable = (element) => element.setAttribute('enabled', false);
@@ -46,22 +54,28 @@
   });
 </script>
 
-<a id="refresh" on:click={reload}>
-  <img src="images/refresh_black_24dp.svg" alt="Refresh" />
-</a>
-<a id="download" enabled={hasFile} href={fileUrl} bind:this={downloadElement} on:click={onDownload}>
-  <img src="images/download_black_24dp.svg" alt="Download" />
-</a>
-<a id="share" enabled={hasFile} bind:this={shareElement} on:click={share}>
-  <img src="images/share_black_24dp.svg" alt="Share" />
-</a>
-<a id="dummyDownload" bind:this={dummyDownloadElement} download />
+<mwc-fab enabled={hasFile} on:click={toggleHide}>
+  <mwc-icon slot="icon">{visibility}</mwc-icon>
+</mwc-fab>
+<mwc-fab on:click={reload}>
+  <mwc-icon id="refresh" slot="icon">refresh</mwc-icon>
+</mwc-fab>
+<mwc-fab enabled={hasFile} on:click={onDownload} href={fileUrl} bind:this={downloadElement}>
+  <mwc-icon id="download" slot="icon">file_download</mwc-icon>
+</mwc-fab>
+<mwc-fab enabled={hasFile} bind:this={shareElement} on:click={share}>
+  <mwc-icon id="share" slot="icon">share</mwc-icon>
+</mwc-fab>
+<a id="dummyDownload" bind:this={dummyDownloadElement} download style="display:none;">dummy</a>
 
 <style>
-  a[enabled='false'] {
+  mwc-fab {
+    z-index: 2;
+  }
+  mwc-fab[enabled='false'] {
     display: none;
   }
-  a[enabled='true'] {
+  mwc-fab[enabled='true'] {
     display: initial;
   }
 </style>

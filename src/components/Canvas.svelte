@@ -5,7 +5,7 @@
   /* Canvas */
   let imgFile: HTMLImageElement;
   let refresh = false;
-  let mask = false;
+  export let mask;
   let editorPanel: HTMLDivElement;
   let canvas: HTMLCanvasElement;
   let ctx;
@@ -64,6 +64,10 @@
         reject(err);
       }
     });
+  }
+
+  export function hide(hidden: boolean) {
+    mask = hidden;
   }
 
   onMount(() => {
@@ -220,11 +224,6 @@
 </script>
 
 <div class="container">
-  <div class="controls">
-    <button on:click={() => (mask = !mask)}>
-      {mask ? 'Show masking' : 'Hide masking'}
-    </button>
-  </div>
   <div class="editor">
     <div bind:this={editorPanel} class="editor-panel" class:mask name="map-panel">
       {#each storedRects as { x, y, w, h, text }, i}
@@ -253,10 +252,6 @@
     align-content: center;
     justify-content: center;
     width: 100%;
-  }
-
-  .controls {
-    margin: 20px;
   }
 
   .editor-panel button {

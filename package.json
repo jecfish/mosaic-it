@@ -34,6 +34,8 @@
   },
   "type": "module",
   "dependencies": {
+    "@material/mwc-fab": "^0.25.3",
+    "@material/mwc-icon": "^0.25.3",
     "pinch-zoom-element": "^1.1.1",
     "tesseract.js": "^2.1.5"
   }

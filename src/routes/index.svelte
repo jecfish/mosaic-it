@@ -12,6 +12,7 @@
   let isLoadingMode: boolean = false;
   let isFileDropMode: boolean = true;
   let detectedWords: Rect[] = [];
+  let mask: string;
   const worker = createWorker();
 
   let canvasCmp;
@@ -116,7 +117,7 @@
   <RingLoader size="60" color="#FF3E00" unit="px" duration="1s" />
 </div>
 <div class="canvas-container" class:hide={isFileDropMode || isLoadingMode}>
-  <Canvas bind:this={canvasCmp}>
+  <Canvas bind:this={canvasCmp} bind:value={mask}>
     {#if fileUrl != undefined}
       <!-- disable resize -->
       <!-- style="max-width:100%;max-height:90vh;" -->
@@ -145,7 +146,7 @@
   </file-drop>
 {/if}
 
-<div id="control-container"><Controls {file} {fileUrl} onDownloadHandler={download} /></div>
+<div id="control-container"><Controls {file} {fileUrl} {mask} onDownloadHandler={download} /></div>
 
 <style>
   #control-container {
@@ -154,8 +155,6 @@
     right: 0;
     margin: 2em;
     padding: 1em;
-    border-radius: 2em;
-    background-color: hotpink;
   }
 
   .canvas-container {
