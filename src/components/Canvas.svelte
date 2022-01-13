@@ -225,7 +225,11 @@
   <div class="editor">
     <div bind:this={editorPanel} class="editor-panel" class:mask name="map-panel">
       {#each storedRects as { x, y, w, h, text }, i}
-        <button class="rect" style={`left:${x}px;top:${y}px;width:${w}px;height:${h}px`} on:click={toggleMosaic(i)}></button>
+        <button
+          class="rect"
+          style={`left:${x}px;top:${y}px;width:${w}px;height:${h}px`}
+          on:click={toggleMosaic(i)}
+        />
         <button on:click={(e) => deleteRect(i, e)} style={`left:${x}px;top:${y}px;`}>x</button>
       {/each}
     </div>
@@ -256,6 +260,7 @@
     position: absolute;
     z-index: 1;
     background: rgb(87 87 87 / 50%);
+    cursor: pointer;
     border: none;
     color: white;
   }
@@ -266,12 +271,9 @@
     height: 60px;
   }
 
-  button {
-    cursor: pointer;
-  }
-  
   .rect {
     position: absolute;
+    background: rgb(87 87 87 / 20%);
   }
 
   canvas {
