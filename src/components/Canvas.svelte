@@ -15,7 +15,7 @@
   let scaleFactor: number = 1;
   let imgResizeObserver: ResizeObserver;
   const temptRect = new Rect();
-  const pixels = 50; // pixeleration density
+  const pixels = 100; // pixeleration density
 
   export function init(img, rects: Rect[] = []) {
     imgFile = img;
@@ -32,10 +32,10 @@
     const scaledHeight = Math.floor(height / pixSize);
 
     const pixCanvas = document.createElement('canvas');
-    pixCanvas.width = pixels;
+    pixCanvas.width = scaledWidth;
     pixCanvas.height = scaledHeight;
     pixCtx = pixCanvas.getContext('2d');
-    pixCtx.drawImage(img, 0, 0, pixels, scaledHeight);
+    pixCtx.drawImage(img, 0, 0, scaledWidth, scaledHeight);
 
     storedRects = [...storedRects, ...rects];
 
@@ -151,8 +151,8 @@
   async function pixelerate(rect: Rect): Promise<void> {
     const pixX = Math.floor(rect.orig.x / pixSize);
     const pixY = Math.floor(rect.orig.y / pixSize);
-    const pixW = Math.floor(rect.orig.w / pixSize) || 1;
-    const pixH = Math.floor(rect.orig.h / pixSize) || 1;
+    const pixW = Math.floor(rect.orig.w / pixSize);
+    const pixH = Math.floor(rect.orig.h / pixSize);
 
     // Enable pixeleration by disabling smoothing.
     ctx.imageSmoothingEnabled = false;
@@ -299,7 +299,7 @@
   }
 
   .editor-panel button.fill {
-    border: none;
+    border: 2px dashed rgb(87 87 87 / 90%);
   }
 
   .editor-panel {
