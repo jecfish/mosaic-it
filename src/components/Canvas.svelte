@@ -124,11 +124,6 @@
     requestAnimationFrame(mainLoop);
   }
 
-  function mosaicIt() {
-    storedRects.map((item) => (item.fill = true));
-    draw();
-  }
-
   function toggleMosaic(i) {
     const rectIndex = i;
     return (e) => {
@@ -217,7 +212,6 @@
 
 <div class="container">
   <div class="controls">
-    <button on:click={mosaicIt}>Apply masking</button>
     <button on:click={() => (mask = !mask)}>
       {mask ? 'Show masking' : 'Hide masking'}
     </button>
